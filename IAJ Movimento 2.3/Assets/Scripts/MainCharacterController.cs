@@ -16,8 +16,8 @@ public class MainCharacterController : MonoBehaviour {
     private const float MAX_ACCELERATION = 40.0f;
     private const float MAX_SPEED = 20.0f;
     private const float DRAG = 0.1f;
-    private const float MAX_LOOK_AHEAD = 10.0f;
-    private const float AVOID_MARGIN = 100.0f;
+    private const float MAX_LOOK_AHEAD = 20.0f;
+    private const float AVOID_MARGIN = 20.0f;
 
 
     public KeyCode stopKey = KeyCode.S;
@@ -69,7 +69,7 @@ public class MainCharacterController : MonoBehaviour {
                 Character = this.character.KinematicData,
                 DebugColor = Color.magenta
             };
-           this.blendedMovement.Movements.Add(new MovementWithWeight(avoidObstacleMovement, 1f));
+           this.blendedMovement.Movements.Add(new MovementWithWeight(avoidObstacleMovement, 5f));
            this.priorityMovement.Movements.Add(avoidObstacleMovement);
         }
 
