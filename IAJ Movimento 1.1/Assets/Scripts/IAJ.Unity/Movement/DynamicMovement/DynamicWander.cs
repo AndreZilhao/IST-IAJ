@@ -29,7 +29,6 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
         public override MovementOutput GetMovement()
         {
             //TODO implement Dynamic Wander movement
-            Debug.Log("WanderRate: " + WanderRate);
             WanderAngle += RandomHelper.RandomBinomial() * WanderRate;
             float TargetOrientation = WanderAngle + this.Character.Orientation;
 

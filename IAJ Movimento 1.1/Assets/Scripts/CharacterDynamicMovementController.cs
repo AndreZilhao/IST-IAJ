@@ -76,9 +76,15 @@ public class CharacterDynamicMovementController : MonoBehaviour {
         else if (Input.GetKeyDown(arriveKey))
         {
             this.debugTarget.SetActive(false);
-            //TODO implement DynamicArrive and initialize it here
-            
+            this.character.Movement = new DynamicArrive
+            {
+                Character = this.character.KinematicData,
+                Target = this.targetCharacter.KinematicData,
+                MaxAcceleration = MAX_ACCELERATION,
+                DestinationTarget = targetCharacter.KinematicData,
+            };
         }
+
         else if (Input.GetKeyDown(wanderKey))
         {
             this.debugTarget.SetActive(true);
