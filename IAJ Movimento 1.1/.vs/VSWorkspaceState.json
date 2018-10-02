@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Assets",
+    "\\Assets\\Scripts",
+    "\\Assets\\Scripts\\IAJ.Unity",
+    "\\Assets\\Scripts\\IAJ.Unity\\Movement",
+    "\\Assets\\Scripts\\IAJ.Unity\\Movement\\DynamicMovement",
+    "\\Assets\\Scripts\\IAJ.Unity\\Movement\\KinematicMovement"
+  ],
+  "SelectedNode": "\\Assets\\Scripts\\CharacterDynamicMovementController.cs",
+  "PreviewInSolutionExplorer": false
+}
