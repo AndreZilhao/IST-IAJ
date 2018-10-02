@@ -20,130 +20,64 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
             RaycastHit hit;
             float RayLength = MaxLookAhead + Character.velocity.magnitude /2;
             float WhiskerRayLength = MaxLookAhead*0.75f;
-
             float angle = 0.1f;//Util.MathConstants.MATH_PI_4;
+            bool isHit = false;
             Vector3 perpendicular = Util.MathHelper.PerpendicularVector2D(Character.velocity.normalized)*0.7f;
+            Vector3 desiredPosition = new Vector3();
+            Vector3 charPos = this.Character.Position;
+            Vector3 charOri = this.Character.velocity.normalized;
 
-            //Main Ray
-            Debug.DrawRay(this.Character.Position, this.Character.velocity.normalized * RayLength, Color.blue);
-            if (Physics.Raycast(this.Character.Position, this.Character.velocity.normalized, out hit, RayLength))
-            {
-                //Sanitizing for the appropriate collision
-                if (hit.collider.gameObject == Collider.gameObject)
-                {
-
-                    //Can't choose left or right? Tilt towards a random side. Else use normal.
-                    Vector3 desiredPosition;
-                    if (hit.normal.normalized == -Character.velocity.normalized)
-                    {
-                        Vector3 randomOffset;
-                        if (Random.value < 0.5f)
-                        { 
-                            randomOffset = new Vector3(0, 0, 1);
-                        }
-                        else
-                        { 
-                            randomOffset = new Vector3(1, 0, 0);
-                        }          
-                        desiredPosition = hit.point + randomOffset * AvoidMargin;
-                    } else
-                    {
-                        desiredPosition = hit.point + hit.normal * AvoidMargin;
-                    }
-                    
-                    //Dynamic Seek Component
-                    this.Output.linear = desiredPosition - this.Character.Position;
-
-                    if (this.Output.linear.sqrMagnitude > 0)
-                    {
-                        this.Output.linear.Normalize();
-                        this.Output.linear *= this.MaxAcceleration;
-                    }
-
-                    return this.Output;
-                }
-            }
             //Left Whisker
-            Debug.DrawRay(this.Character.Position - perpendicular, Util.MathHelper.Rotate2D(this.Character.velocity.normalized, +angle) * WhiskerRayLength, Color.blue);
+            Debug.DrawRay(charPos - perpendicular, Util.MathHelper.Rotate2D(charOri, +angle) * WhiskerRayLength, Color.blue);
             if (Physics.Raycast(this.Character.Position - perpendicular, Util.MathHelper.Rotate2D(this.Character.velocity.normalized, +angle), out hit, RayLength))
             {
-                //Sanitizing for the appropriate collision
                 if (hit.collider.gameObject == Collider.gameObject)
                 {
-
-                    //Can't choose left or right? Tilt towards a random side. Else use normal.
-                    Vector3 desiredPosition;
-                    if (hit.normal.normalized == -Character.velocity.normalized)
-                    {
-                        Vector3 randomOffset;
-                        if (Random.value < 0.5f)
-                        {
-                            randomOffset = new Vector3(0, 0, 1);
-                        }
-                        else
-                        {
-                            randomOffset = new Vector3(1, 0, 0);
-                        }
-                        desiredPosition = hit.point + randomOffset * AvoidMargin;
-                    }
-                    else
-                    {
-                        desiredPosition = hit.point + hit.normal * AvoidMargin;
-                    }
-
-                    //Dynamic Seek Component
-                    this.Output.linear = desiredPosition - this.Character.Position;
-
-                    if (this.Output.linear.sqrMagnitude > 0)
-                    {
-                        this.Output.linear.Normalize();
-                        this.Output.linear *= this.MaxAcceleration;
-                    }
-
-                    return this.Output;
+                    desiredPosition = hit.point + hit.normal * AvoidMargin;
+                    isHit = true;
                 }
             }
             //Right Whisker
-            Debug.DrawRay(this.Character.Position + perpendicular, Util.MathHelper.Rotate2D(this.Character.velocity.normalized, -angle) * WhiskerRayLength, Color.blue);
-            if (Physics.Raycast(this.Character.Position + perpendicular, Util.MathHelper.Rotate2D(this.Character.velocity.normalized, -angle), out hit, RayLength))
+            Debug.DrawRay(charPos + perpendicular, Util.MathHelper.Rotate2D(charOri, -angle) * WhiskerRayLength, Color.blue);
+            if (Physics.Raycast(charPos + perpendicular, Util.MathHelper.Rotate2D(charOri, -angle), out hit, RayLength))
             {
-                //Sanitizing for the appropriate collision
                 if (hit.collider.gameObject == Collider.gameObject)
                 {
-
+                    desiredPosition = hit.point + hit.normal * AvoidMargin;
+                    isHit = true;
+                }
+            }
+            //Main Ray
+            Debug.DrawRay(charPos, charOri * RayLength, Color.blue);
+            if (Physics.Raycast(charPos, charOri, out hit, RayLength))
+            { 
+                if (hit.collider.gameObject == Collider.gameObject)
+                {
                     //Can't choose left or right? Tilt towards a random side. Else use normal.
-                    Vector3 desiredPosition;
-                    if (hit.normal.normalized == -Character.velocity.normalized)
+                    isHit = true;
+                    if (hit.normal.normalized == -charOri)
                     {
                         Vector3 randomOffset;
                         if (Random.value < 0.5f)
-                        {
                             randomOffset = new Vector3(0, 0, 1);
-                        }
                         else
-                        {
                             randomOffset = new Vector3(1, 0, 0);
-                        }
                         desiredPosition = hit.point + randomOffset * AvoidMargin;
                     }
                     else
-                    {
                         desiredPosition = hit.point + hit.normal * AvoidMargin;
-                    }
-
-                    //Dynamic Seek Component
-                    this.Output.linear = desiredPosition - this.Character.Position;
-
-                    if (this.Output.linear.sqrMagnitude > 0)
-                    {
-                        this.Output.linear.Normalize();
-                        this.Output.linear *= this.MaxAcceleration;
-                    }
-
-                    return this.Output;
                 }
             }
-
+            if (isHit)
+            {
+                this.Output.linear = desiredPosition - charPos;
+                if (this.Output.linear.sqrMagnitude > 0)
+                {
+                    this.Output.linear.Normalize();
+                    this.Output.linear *= this.MaxAcceleration;
+                }
+                return this.Output;
+            }
             return new MovementOutput();
         }
     }
