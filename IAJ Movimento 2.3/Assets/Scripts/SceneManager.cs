@@ -10,7 +10,7 @@ public class SceneManager : MonoBehaviour
 {
     public const float X_WORLD_SIZE = 55;
     public const float Z_WORLD_SIZE = 32.5f;
-    public const float AVOID_MARGIN = 4.0f;
+    public const float AVOID_MARGIN = 10.0f;
     public const float MAX_SPEED = 20.0f;
     public const float MAX_ACCELERATION = 40.0f;
     public const float DRAG = 0.1f;
@@ -41,10 +41,17 @@ public class SceneManager : MonoBehaviour
                 this.mainCharacterController.stopKey + " - Stop"; 
 		}
 	    
-        
-	    var obstacles = GameObject.FindGameObjectsWithTag("Obstacle");
+        // Changes to obstacles for efficiency
+	    var obstacleObjects = GameObject.FindGameObjectsWithTag("Obstacle");
+        var obstacles = new List<Obstacle>();
 
-	    this.characterControllers = this.CloneCharacters(this.mainCharacterGameObject, 5, obstacles);
+        foreach (var obstacle in obstacleObjects)
+        {
+            obstacles.Add(new Obstacle(obstacle.gameObject, obstacle.GetComponent<Collider>()));
+        }
+
+
+        this.characterControllers = this.CloneCharacters(this.mainCharacterGameObject, 1, obstacles);
         this.characterControllers.Add(this.mainCharacterGameObject.GetComponent<MainCharacterController>());
 
         //LINQ expression with a lambda function, returns an array with the DynamicCharacter for each character controler
@@ -59,7 +66,7 @@ public class SceneManager : MonoBehaviour
 	    }
 	}
 
-    private List<MainCharacterController> CloneCharacters(GameObject objectToClone,int numberOfCharacters, GameObject[] obstacles)
+    private List<MainCharacterController> CloneCharacters(GameObject objectToClone,int numberOfCharacters, List<Obstacle> obstacles)
     {
         var characters = new List<MainCharacterController>();
         var deltaColor = 1.0f / numberOfCharacters;

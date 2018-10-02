@@ -24,7 +24,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
         {
             this.PatrolPosition1 = new KinematicData { Position = PatrolPosition1 };
             this.PatrolPosition2 = new KinematicData { Position = PatrolPosition2 };
-            this.IsTarget1 = true;
+            this.IsTarget1 = false;
         }
 
         public void ChangeTarget()

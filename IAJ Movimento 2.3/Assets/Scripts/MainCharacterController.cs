@@ -17,7 +17,7 @@ public class MainCharacterController : MonoBehaviour {
     private const float MAX_SPEED = 20.0f;
     private const float DRAG = 0.1f;
     private const float MAX_LOOK_AHEAD = 10.0f;
-    private const float AVOID_MARGIN = 5.0f;
+    private const float AVOID_MARGIN = 30.0f;
 
 
     public KeyCode stopKey = KeyCode.S;
@@ -56,21 +56,21 @@ public class MainCharacterController : MonoBehaviour {
     {
     }
 
-    public void InitializeMovement(GameObject[] obstacles, List<DynamicCharacter> characters)
+    public void InitializeMovement(List<Obstacle> obstacles, List<DynamicCharacter> characters)
     {
         foreach (var obstacle in obstacles)
         {
             //TODO: add your AvoidObstacle movement here
-            //var avoidObstacleMovement = new DynamicAvoidObstacle(obstacle)
-            //{
-            //    MaxAcceleration = MAX_ACCELERATION,
-            //    AvoidMargin = AVOID_MARGIN,
-            //    MaxLookAhead = MAX_LOOK_AHEAD,
-            //    Character = this.character.KinematicData,
-            //    DebugColor = Color.magenta
-            //};
-            //this.blendedMovement.Movements.Add(new MovementWithWeight(avoidObstacleMovement, 2.0f));
-            //this.priorityMovement.Movements.Add(avoidObstacleMovement);
+            var avoidObstacleMovement = new DynamicAvoidObstacle(obstacle)
+            {
+                MaxAcceleration = MAX_ACCELERATION,
+                AvoidMargin = AVOID_MARGIN,
+                MaxLookAhead = MAX_LOOK_AHEAD,
+                Character = this.character.KinematicData,
+                DebugColor = Color.magenta
+            };
+           this.blendedMovement.Movements.Add(new MovementWithWeight(avoidObstacleMovement, 1f));
+           this.priorityMovement.Movements.Add(avoidObstacleMovement);
         }
 
         foreach (var otherCharacter in characters)
@@ -100,7 +100,7 @@ public class MainCharacterController : MonoBehaviour {
             DebugColor = Color.yellow
         };
 
-        this.rvoMovement = new RVOMovement(this.patrolMovement, characters.Select(c => c.KinematicData).ToList(), obstacles.Select(o => new StaticData(o.transform)).ToList())
+        this.rvoMovement = new RVOMovement(this.patrolMovement, characters.Select(c => c.KinematicData).ToList(), obstacles.Select(o => new StaticData(o.GameObject.transform)).ToList())
         {
             Character = this.character.KinematicData,
             MaxAcceleration = MAX_ACCELERATION,
@@ -108,7 +108,7 @@ public class MainCharacterController : MonoBehaviour {
         };
 
         this.priorityMovement.Movements.Add(patrolMovement);
-        this.blendedMovement.Movements.Add(new MovementWithWeight(patrolMovement, 1));
+        this.blendedMovement.Movements.Add(new MovementWithWeight(patrolMovement, 1f));
         this.character.Movement = this.priorityMovement;
     }
 
