@@ -10,7 +10,7 @@ public class SceneManager : MonoBehaviour
 {
     public const float X_WORLD_SIZE = 55;
     public const float Z_WORLD_SIZE = 32.5f;
-    public const float AVOID_MARGIN = 10.0f;
+    public const float AVOID_MARGIN = 100.0f;
     public const float MAX_SPEED = 20.0f;
     public const float MAX_ACCELERATION = 40.0f;
     public const float DRAG = 0.1f;
@@ -51,7 +51,7 @@ public class SceneManager : MonoBehaviour
         }
 
 
-        this.characterControllers = this.CloneCharacters(this.mainCharacterGameObject, 1, obstacles);
+        this.characterControllers = this.CloneCharacters(this.mainCharacterGameObject, 50, obstacles);
         this.characterControllers.Add(this.mainCharacterGameObject.GetComponent<MainCharacterController>());
 
         //LINQ expression with a lambda function, returns an array with the DynamicCharacter for each character controler

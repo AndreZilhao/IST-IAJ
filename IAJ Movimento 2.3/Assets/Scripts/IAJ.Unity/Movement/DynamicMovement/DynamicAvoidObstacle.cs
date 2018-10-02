@@ -18,8 +18,11 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
         {
 
             RaycastHit hit;
-            Debug.DrawRay(this.Character.Position, this.Character.velocity.normalized * MaxLookAhead, Color.blue);
-            if (Physics.Raycast(this.Character.Position, this.Character.velocity.normalized, out hit, MaxLookAhead))
+            float RayLength = MaxLookAhead + Character.velocity.magnitude;
+
+
+            Debug.DrawRay(this.Character.Position, this.Character.velocity.normalized * RayLength, Color.blue);
+            if (Physics.Raycast(this.Character.Position, this.Character.velocity.normalized, out hit, RayLength))
             {
                 //Sanitizing for the appropriate collision
               

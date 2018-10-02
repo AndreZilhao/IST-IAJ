@@ -17,7 +17,7 @@ public class MainCharacterController : MonoBehaviour {
     private const float MAX_SPEED = 20.0f;
     private const float DRAG = 0.1f;
     private const float MAX_LOOK_AHEAD = 10.0f;
-    private const float AVOID_MARGIN = 30.0f;
+    private const float AVOID_MARGIN = 100.0f;
 
 
     public KeyCode stopKey = KeyCode.S;
