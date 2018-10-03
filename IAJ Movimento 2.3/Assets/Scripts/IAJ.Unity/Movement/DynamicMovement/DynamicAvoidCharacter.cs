@@ -36,10 +36,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
             Vector3 futureDeltaPos = deltaPos + deltaVel * timeToClosest;
             float futureDistance = futureDeltaPos.magnitude;
 
-
             if (futureDistance > 2 * CollisionRadius) return new MovementOutput(); // check collision radius
-
-            
 
             if (futureDistance <= 0 || deltaPos.magnitude < 2 * CollisionRadius)
             {

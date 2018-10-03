@@ -19,7 +19,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
         public DynamicArrive()
         {
             MaxSpeed = 20f;
-            StopRadius = 3f;
+            StopRadius = 2f;
             SlowRadius = 30f;
             this.Output = new MovementOutput();
         }
@@ -40,7 +40,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
             }
             else
             {
-                desiredSpeed = MaxSpeed * (distance / SlowRadius);
+                desiredSpeed = MaxSpeed * (distance / (SlowRadius*2));
             }
             Vector3 desiredVelocity = direction.normalized * desiredSpeed;
 

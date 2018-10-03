@@ -1,12 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
 namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
 {
-    public class DynamicAvoidObstacle : DynamicSeek
+    public class DynamicAvoidObstacles : DynamicSeek
     {
-        public DynamicAvoidObstacle(Obstacle obstacle)
-        {
-            Collider = obstacle.Collider;
-        }
+        public DynamicAvoidObstacles() {}
 
         public override string Name
         {
@@ -15,10 +14,8 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
 
         public float AvoidMargin { get; set; }
         public float MaxLookAhead { get; set; }
-        Collider Collider { get; set; }
 
 
-        //use singular avoid obstacle instead of a for loop IMPORTANT OPTIMIZATION
         public override MovementOutput GetMovement()
         {
             RaycastHit hit;
@@ -39,7 +36,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
             Debug.DrawRay(charPos, charOri * RayLength, Color.blue);
             if (Physics.Raycast(charPos, charOri, out hit, RayLength))
             {
-                if (hit.collider.gameObject == Collider.gameObject)
+                if (hit.collider.gameObject.tag == "Obstacle")
                 {
                     //Can't choose left or right? Tilt towards a random side. Else use normal.
                     if (hit.normal.normalized == -charOri)
@@ -60,7 +57,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
             Debug.DrawRay(charPos - perpendicular, Util.MathHelper.Rotate2D(charOri, +angle) * WhiskerRayLength, Color.blue);
             if (Physics.Raycast(charPos - perpendicular, Util.MathHelper.Rotate2D(charOri, +angle), out hit, RayLength))
             {
-                if (hit.collider.gameObject == Collider.gameObject)
+                if (hit.collider.gameObject.tag == "Obstacle")
                 {
                     base.Target.Position = hit.point + hit.normal * AvoidMargin;
                     return base.GetMovement();
@@ -70,7 +67,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.DynamicMovement
             Debug.DrawRay(charPos + perpendicular, Util.MathHelper.Rotate2D(charOri, -angle) * WhiskerRayLength, Color.blue);
             if (Physics.Raycast(charPos + perpendicular, Util.MathHelper.Rotate2D(charOri, -angle), out hit, RayLength))
             {
-                if (hit.collider.gameObject == Collider.gameObject)
+                if (hit.collider.gameObject.tag == "Obstacle")
                 {
                     base.Target.Position = hit.point + hit.normal * AvoidMargin;
                     return base.GetMovement();

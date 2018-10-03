@@ -9,7 +9,8 @@ using System.Collections.Generic;
 using Assets.Scripts.IAJ.Unity.Movement.VO;
 using Assets.Scripts.IAJ.Unity.Movement;
 
-public class MainCharacterController : MonoBehaviour {
+public class MainCharacterController : MonoBehaviour
+{
 
     public const float X_WORLD_SIZE = 55;
     public const float Z_WORLD_SIZE = 32.5f;
@@ -18,7 +19,7 @@ public class MainCharacterController : MonoBehaviour {
     private const float DRAG = 0.1f;
     private const float MAX_LOOK_AHEAD = 20.0f;
     private const float AVOID_MARGIN = 20.0f;
-    private const float MAX_TIME_LOOK_AHEAD = 0.1f;
+    private const float MAX_TIME_LOOK_AHEAD = 2f;
 
 
     public KeyCode stopKey = KeyCode.S;
@@ -39,7 +40,7 @@ public class MainCharacterController : MonoBehaviour {
     void Awake()
     {
         this.character = new DynamicCharacter(this.gameObject);
-    
+
 
         this.priorityMovement = new PriorityMovement
         {
@@ -53,27 +54,25 @@ public class MainCharacterController : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
     }
 
     public void InitializeMovement(List<Obstacle> obstacles, List<DynamicCharacter> characters)
     {
-        foreach (var obstacle in obstacles)
+        //TODO: add your AvoidObstacle movement here
+        var avoidObstacleMovement = new DynamicAvoidObstacles()
         {
-            //TODO: add your AvoidObstacle movement here
-            var avoidObstacleMovement = new DynamicAvoidObstacle(obstacle)
-            {
-                MaxAcceleration = MAX_ACCELERATION,
-                AvoidMargin = AVOID_MARGIN,
-                MaxLookAhead = MAX_LOOK_AHEAD,
-                Character = this.character.KinematicData,
-                DebugColor = Color.magenta,
-                Target = new KinematicData(),
-            };
-           this.blendedMovement.Movements.Add(new MovementWithWeight(avoidObstacleMovement, 1f));
-           this.priorityMovement.Movements.Add(avoidObstacleMovement);
-        }
+            MaxAcceleration = MAX_ACCELERATION,
+            AvoidMargin = AVOID_MARGIN,
+            MaxLookAhead = MAX_LOOK_AHEAD,
+            Character = this.character.KinematicData,
+            DebugColor = Color.magenta,
+            Target = new KinematicData()
+        };
+        this.blendedMovement.Movements.Add(new MovementWithWeight(avoidObstacleMovement, 1f));
+        this.priorityMovement.Movements.Add(avoidObstacleMovement);
+
 
         foreach (var otherCharacter in characters)
         {
@@ -84,13 +83,13 @@ public class MainCharacterController : MonoBehaviour {
                 {
                     Character = this.character.KinematicData,
                     MaxAcceleration = MAX_ACCELERATION,
-                    CollisionRadius = 5f,
+                    CollisionRadius = 0.2f,
                     MaxTimeLookAhead = MAX_TIME_LOOK_AHEAD,
                     DebugColor = Color.cyan
                 };
 
-                //this.blendedMovement.Movements.Add(new MovementWithWeight(avoidCharacter, 1.0f));
-                //this.priorityMovement.Movements.Add(avoidCharacter);
+                this.blendedMovement.Movements.Add(new MovementWithWeight(avoidCharacter, 1.0f));
+                this.priorityMovement.Movements.Add(avoidCharacter);
             }
         }
 
@@ -111,14 +110,14 @@ public class MainCharacterController : MonoBehaviour {
         };
 
         this.priorityMovement.Movements.Add(patrolMovement);
-        this.blendedMovement.Movements.Add(new MovementWithWeight(patrolMovement, 5f));
+        this.blendedMovement.Movements.Add(new MovementWithWeight(patrolMovement, 2f));
         this.character.Movement = this.priorityMovement;
     }
 
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             this.patrolMovement.ChangeTarget();
         }
@@ -134,7 +133,7 @@ public class MainCharacterController : MonoBehaviour {
         {
             this.character.Movement = this.priorityMovement;
         }
-        else if(Input.GetKeyDown(KeyCode.R))
+        else if (Input.GetKeyDown(KeyCode.R))
         {
             this.character.Movement = this.rvoMovement;
         }
