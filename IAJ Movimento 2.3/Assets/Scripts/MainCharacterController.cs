@@ -18,6 +18,7 @@ public class MainCharacterController : MonoBehaviour {
     private const float DRAG = 0.1f;
     private const float MAX_LOOK_AHEAD = 20.0f;
     private const float AVOID_MARGIN = 20.0f;
+    private const float MAX_TIME_LOOK_AHEAD = 0.1f;
 
 
     public KeyCode stopKey = KeyCode.S;
@@ -67,9 +68,10 @@ public class MainCharacterController : MonoBehaviour {
                 AvoidMargin = AVOID_MARGIN,
                 MaxLookAhead = MAX_LOOK_AHEAD,
                 Character = this.character.KinematicData,
-                DebugColor = Color.magenta
+                DebugColor = Color.magenta,
+                Target = new KinematicData(),
             };
-           this.blendedMovement.Movements.Add(new MovementWithWeight(avoidObstacleMovement, 5f));
+           this.blendedMovement.Movements.Add(new MovementWithWeight(avoidObstacleMovement, 1f));
            this.priorityMovement.Movements.Add(avoidObstacleMovement);
         }
 
@@ -78,15 +80,16 @@ public class MainCharacterController : MonoBehaviour {
             if (otherCharacter != this.character)
             {
                 //TODO: add your AvoidCharacter movement here
-                //var avoidCharacter = new DynamicAvoidCharacter(otherCharacter.KinematicData)
-                //{
-                //    Character = this.character.KinematicData,
-                //    MaxAcceleration = MAX_ACCELERATION,
-                //    AvoidMargin = AVOID_MARGIN,
-                //    DebugColor = Color.cyan
-                //};
+                var avoidCharacter = new DynamicAvoidCharacter(otherCharacter.KinematicData)
+                {
+                    Character = this.character.KinematicData,
+                    MaxAcceleration = MAX_ACCELERATION,
+                    CollisionRadius = 5f,
+                    MaxTimeLookAhead = MAX_TIME_LOOK_AHEAD,
+                    DebugColor = Color.cyan
+                };
 
-                //this.blendedMovement.Movements.Add(new MovementWithWeight(avoidCharacter, 2.0f));
+                //this.blendedMovement.Movements.Add(new MovementWithWeight(avoidCharacter, 1.0f));
                 //this.priorityMovement.Movements.Add(avoidCharacter);
             }
         }
@@ -108,7 +111,7 @@ public class MainCharacterController : MonoBehaviour {
         };
 
         this.priorityMovement.Movements.Add(patrolMovement);
-        this.blendedMovement.Movements.Add(new MovementWithWeight(patrolMovement, 1f));
+        this.blendedMovement.Movements.Add(new MovementWithWeight(patrolMovement, 5f));
         this.character.Movement = this.priorityMovement;
     }
 
