@@ -50,8 +50,8 @@ namespace Assets.Scripts.IAJ.Unity.Movement.VO {
             //initialize other properties if you think is relevant
 			samples = new List<Vector3>();
 
-			numSamples = 3;
-			W = 100f;
+			numSamples = 5;
+			W = 50f;
             O = 50f;
         }
 
@@ -81,7 +81,11 @@ namespace Assets.Scripts.IAJ.Unity.Movement.VO {
 			minimumPenalty = Mathf.Infinity;
 
 			foreach (var sample in Samples) {
+                //OPTIMIZATION -> If the distance penalty by itself is worse than our current minimum penalty, no point in checking any further.
                 distancePenalty = (desiredVelocity - sample).magnitude;
+                if (distancePenalty > minimumPenalty)
+                    continue;
+                //END OPTIMIZATION
 				maximumTimePenalty = 0.0f;
 
                 //MOBILE OBSTACLE DETECTION
@@ -90,7 +94,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.VO {
 					if (deltaP.magnitude > IgnoreDistance)
 						continue;
 
-					rayVector = 2.0f * sample - (this.Character.velocity - b.velocity);
+					rayVector = 2.0f * sample - this.Character.velocity - b.velocity;
 					tc = MathHelper.TimeToCollisionBetweenRayAndCircle (this.Character.Position, rayVector, b.Position, CharacterSize*2.0f);
 
 					if (tc > 0.0f)
@@ -106,13 +110,13 @@ namespace Assets.Scripts.IAJ.Unity.Movement.VO {
 
                 //STATIC OBSTACLE DETECTION
                 foreach (var b in Obstacles)
-                {
+                { 
                     deltaP = b.Position - this.Character.Position;
-                    if (deltaP.magnitude > IgnoreDistance/1.5f)
+                    if (deltaP.magnitude > 5)
                         continue;
 
                     rayVector = 2.0f * sample - this.Character.velocity;
-                    tc = MathHelper.TimeToCollisionBetweenRayAndCircle(this.Character.Position, rayVector, b.Position, CharacterSize * 1.0f);
+                    tc = MathHelper.TimeToCollisionBetweenRayAndCircle(this.Character.Position, rayVector, b.Position, CharacterSize * 1.5f);
                     if (tc > 0.0f)
                         timePenalty = O / tc;
                     else if (tc == 0.0f)

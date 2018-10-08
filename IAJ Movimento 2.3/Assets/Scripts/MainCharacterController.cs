@@ -113,7 +113,7 @@ public class MainCharacterController : MonoBehaviour
 
         this.priorityMovement.Movements.Add(patrolMovement);
         this.blendedMovement.Movements.Add(new MovementWithWeight(patrolMovement, 2f));
-        this.character.Movement = this.priorityMovement;
+        this.character.Movement = this.rvoMovement;
     }
 
 
