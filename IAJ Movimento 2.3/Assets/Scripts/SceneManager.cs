@@ -51,7 +51,7 @@ public class SceneManager : MonoBehaviour
         }
 
 
-        this.characterControllers = this.CloneCharacters(this.mainCharacterGameObject, 50, obstacles);
+        this.characterControllers = this.CloneCharacters(this.mainCharacterGameObject, 5, obstacles);
         this.characterControllers.Add(this.mainCharacterGameObject.GetComponent<MainCharacterController>());
 
         //LINQ expression with a lambda function, returns an array with the DynamicCharacter for each character controler

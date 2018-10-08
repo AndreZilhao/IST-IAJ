@@ -107,6 +107,8 @@ public class MainCharacterController : MonoBehaviour
             Character = this.character.KinematicData,
             MaxAcceleration = MAX_ACCELERATION,
             MaxSpeed = MAX_SPEED,
+            CharacterSize = 3f, 
+            IgnoreDistance = 20f
         };
 
         this.priorityMovement.Movements.Add(patrolMovement);
