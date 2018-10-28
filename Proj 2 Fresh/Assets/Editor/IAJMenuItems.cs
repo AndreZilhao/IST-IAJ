@@ -22,12 +22,13 @@ public class IAJMenuItems
 
         GoalBoundingTable goalBoundingTable = ScriptableObject.CreateInstance<GoalBoundingTable>();
         var nodes = GetNodesHack(navMesh);
-        goalBoundingTable.table = new NodeGoalBounds[nodes.Count];
+        int nodesToProcess = nodes.Count;
+        goalBoundingTable.table = new NodeGoalBounds[nodesToProcess];
 
         NodeGoalBounds auxGoalBounds;
 
         //calculate goal bounds for each edge
-        for (int i=0; i < nodes.Count; i++)
+        for (int i=0; i < nodesToProcess; i++)
         {
             if(nodes[i] is NavMeshEdge)
             {
@@ -39,10 +40,9 @@ public class IAJMenuItems
                     auxGoalBounds.connectionBounds[j] = ScriptableObject.CreateInstance<Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding.Bounds>();
                     auxGoalBounds.connectionBounds[j].InitializeBounds(nodes[i].Position);
                 }
-
-                if(i%10 == 0)
+                if (i%10 == 0)
                 {
-                    float percentage = (float)i / (float)nodes.Count;
+                    float percentage = (float)i / (float)nodesToProcess;
                     EditorUtility.DisplayProgressBar("GoalBounding precomputation progress", "Calculating goal bounds for each edge", percentage);
                 }
 

@@ -3,6 +3,7 @@ using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding;
 using RAIN.Navigation.Graph;
 using RAIN.Navigation.NavMesh;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding
 {
@@ -34,14 +35,84 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding
 
         public void Search(NavigationGraphNode startNode, NodeGoalBounds nodeGoalBounds)
         {
-			//TODO: Implement the algorithm that calculates the goal bounds using a dijkstra
-			//Given that the nodes in the graph correspond to the edges of a polygon, we won't be able to use the vertices of the polygon to update the bounding boxes
+            //TODO: Implement the algorithm that calculates the goal bounds using a dijkstra
+            //Given that the nodes in the graph correspond to the edges of a polygon, we won't be able to use the vertices of the polygon to update the bounding boxes
+            this.Open.Initialize();
+            this.Closed.Initialize();
+
+
+            NodeRecord StartNode = NodeRecordArray.GetNodeRecord(startNode);
+             StartNode.StartNodeOutConnectionIndex = -1;
+             Open.AddToOpen(StartNode);
+             int OpenSize = Open.All().Count;
+
+             while (OpenSize > 0)
+             {
+                 NodeRecord currentNode = Open.GetBestAndRemove();
+                 Open.RemoveFromOpen(currentNode);
+                 Closed.AddToClosed(currentNode);
+                 if(currentNode.StartNodeOutConnectionIndex != -1)
+                 {
+                    nodeGoalBounds.connectionBounds[currentNode.StartNodeOutConnectionIndex].UpdateBounds(currentNode.node.Position);
+                 }
+
+                 //Initialize start node edge colors:
+                 var outConnections = currentNode.node.OutEdgeCount;
+                 for (int i = 0; i < outConnections; i++)
+                 {
+                     this.ProcessChildNode(currentNode, currentNode.node.EdgeOut(i), i);
+                 }
+                 OpenSize = Open.All().Count;
+             }             
         }
 
-       
+
         protected void ProcessChildNode(NodeRecord parent, NavigationGraphEdge connectionEdge, int connectionIndex)
         {
-			//TODO: Implement this method that processes a child node. Then you can use it in the Search method above.
+            //TODO: Implement this method that processes a child node. Then you can use it in the Search method above.
+            var childNode = connectionEdge.ToNode;
+            var childNodeRecord = this.NodeRecordArray.GetNodeRecord(childNode);
+            if (childNodeRecord == null)
+            {
+                //this piece of code is used just because of the special start nodes and goal nodes added to the RAIN Navigation graph when a new search is performed.
+                //Since these special goals were not in the original navigation graph, they will not be stored in the NodeRecordArray and we will have to add them
+                //to a special structure
+                //it's ok if you don't understand this, this is a hack and not part of the NodeArrayA* algorithm, just do NOT CHANGE THIS, or your algorithm will not work
+                childNodeRecord = new NodeRecord
+                {
+                    node = childNode,
+                    parent = parent,
+                    StartNodeOutConnectionIndex = parent.StartNodeOutConnectionIndex,
+                    status = NodeStatus.Unvisited
+                };
+                this.NodeRecordArray.AddSpecialCaseNode(childNodeRecord);
+            }
+
+            //Distribute initial colors throughout startNode children:
+            int color = parent.StartNodeOutConnectionIndex;
+            if (color == -1)
+            {
+                color = connectionIndex;
+            }
+            NodeRecord parentNode = parent;
+            float g = parentNode.gValue + (childNode.LocalPosition - parentNode.node.LocalPosition).magnitude;
+            NodeRecord nodeInOpen = Open.SearchInOpen(childNodeRecord);
+            NodeRecord nodeInClosed = Closed.SearchInClosed(childNodeRecord);
+
+            if (nodeInOpen == null && nodeInClosed == null)
+            {
+                childNodeRecord.parent = parent;
+                childNodeRecord.gValue = g;
+                childNodeRecord.StartNodeOutConnectionIndex = color;
+                Open.AddToOpen(childNodeRecord);
+            }
+            else if (nodeInOpen != null && childNodeRecord.gValue > g)
+            {
+                childNodeRecord.parent = parent;
+                childNodeRecord.gValue = g;
+                childNodeRecord.StartNodeOutConnectionIndex = color;
+                Open.Replace(nodeInOpen, childNodeRecord);
+            }
         }
 
         private List<NavigationGraphNode> GetNodesHack(NavMeshPathGraph graph)
