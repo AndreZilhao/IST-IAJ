@@ -52,7 +52,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.VO {
 
 			numSamples = 5;
 			W = 50f;
-            O = 50f;
+            O = 10f;
         }
 
         public override MovementOutput GetMovement() {
@@ -82,9 +82,9 @@ namespace Assets.Scripts.IAJ.Unity.Movement.VO {
 
 			foreach (var sample in Samples) {
                 //OPTIMIZATION -> If the distance penalty by itself is worse than our current minimum penalty, no point in checking any further.
-                distancePenalty = (desiredVelocity - sample).magnitude;
+                /*distancePenalty = (desiredVelocity - sample).magnitude;
                 if (distancePenalty > minimumPenalty)
-                    continue;
+                    continue;*/
                 //END OPTIMIZATION
 				maximumTimePenalty = 0.0f;
 
@@ -116,7 +116,7 @@ namespace Assets.Scripts.IAJ.Unity.Movement.VO {
                         continue;
 
                     rayVector = 2.0f * sample - this.Character.velocity;
-                    tc = MathHelper.TimeToCollisionBetweenRayAndCircle(this.Character.Position, rayVector, b.Position, CharacterSize * 1.5f);
+                    tc = MathHelper.TimeToCollisionBetweenRayAndCircle(this.Character.Position, rayVector, b.Position, CharacterSize * 0.5f);
                     if (tc > 0.0f)
                         timePenalty = O / tc;
                     else if (tc == 0.0f)
