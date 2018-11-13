@@ -109,7 +109,7 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding
                         this.TotalProcessingTime = (Time.time - startTime);
                         solution = CalculateSolution(bestNode, false);
                         this.InProgress = false;
-                        return false;
+                        return true;
                     }
                     //Open.RemoveFromOpen(bestNode);
                     Closed.AddToClosed(bestNode);
@@ -125,7 +125,7 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding
                 {
                     this.TotalProcessingTime = (Time.time - startTime);
                     solution = CalculateSolution(bestNode, true);
-                    return true;
+                    return false;
                 }
             }
             this.TotalProcessingTime = (Time.time - startTime);
