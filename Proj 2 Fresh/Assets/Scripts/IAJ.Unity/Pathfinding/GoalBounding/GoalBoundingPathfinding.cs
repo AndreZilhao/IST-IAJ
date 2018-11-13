@@ -29,7 +29,8 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding
         {
             //TODO: Implement this method for the GoalBoundingPathfinding to Work. If you implemented the NodeArrayAStar properly, you wont need to change the search method.
             //Fetching index of GoalBoundingTable
-            int index = parentNode.node.NodeIndex;
+            NodeRecord childNodeRecord = NodeRecordArray.GetNodeRecord(connectionEdge.ToNode); 
+            int index = childNodeRecord.node.NodeIndex;
             NodeGoalBounds nodeBounds = GoalBoundingTable.table[index];
 
             if (nodeBounds == null) //Special check for some nodes that have null nodeBounds??? is NodeIndex correct or is the table malformed?
