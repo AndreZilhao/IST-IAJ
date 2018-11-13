@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.GameManager;
+using Assets.Scripts.GameManager;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using System;
 using UnityEngine;

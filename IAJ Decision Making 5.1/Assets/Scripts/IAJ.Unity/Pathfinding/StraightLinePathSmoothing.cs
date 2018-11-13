@@ -2,9 +2,9 @@
 using UnityEditor;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Path;
 
-public class StraightLinePathSmoothing
+public static class StraightLinePathSmoothing
 {
-    public GlobalPath SmoothPath(Vector3 position, GlobalPath currentSolution)
+    public static GlobalPath SmoothPath(Vector3 position, GlobalPath currentSolution)
     {
         GlobalPath PathSmoothed = new GlobalPath();
         for (int j = 0; j < currentSolution.PathPositions.Count; j++)
