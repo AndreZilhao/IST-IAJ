@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.GameManager;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
@@ -22,12 +23,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
         private int CurrentDepth { get; set; }
 
         private float CurrentValue { get; set; }
-        private float BestValue { get; set; }
-        private Action nextAction;
+        //private float BestValue { get; set; }
+        //private Action nextAction;
 
         public DepthLimitedGOAPDecisionMaking(CurrentStateWorldModel currentStateWorldModel, List<Action> actions, List<Goal> goals)
         {
-            this.ActionCombinationsProcessedPerFrame = 200;
+            this.ActionCombinationsProcessedPerFrame = 1000;
             this.Goals = goals;
             this.InitialWorldModel = currentStateWorldModel;
         }
@@ -45,7 +46,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             this.BestAction = null;
             this.BestDiscontentmentValue = float.MaxValue;
             this.InitialWorldModel.Initialize();
-            this.BestValue = Mathf.Infinity;
+            //this.BestValue = Mathf.Infinity;
         }
 
         public Action ChooseAction()
@@ -54,21 +55,26 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
             var startTime = Time.realtimeSinceStartup;
 
-            while (CurrentDepth >= 0)
+            BestAction = null;
+			BestDiscontentmentValue = int.MaxValue;
+
+            while (CurrentDepth >= 0 && processedActions < ActionCombinationsProcessedPerFrame)
             {
                 if (CurrentDepth >= MAX_DEPTH)
                 {
-                    CurrentValue = Models[CurrentDepth].CalculateDiscontentment(this.Goals);
+                    processedActions++;
+                    CurrentValue = Models[CurrentDepth].CalculateDiscontentment(Goals);
 
-                    if (CurrentValue < BestValue)
+                    if (CurrentValue < BestDiscontentmentValue)
                     {
-                        BestValue = CurrentValue;
+                        BestDiscontentmentValue = CurrentValue;
                         BestAction = ActionPerLevel[0];
+                        BestActionSequence = ActionPerLevel.ToArray();
                     }
                     CurrentDepth -= 1;
                     continue;
                 }
-                nextAction = Models[CurrentDepth].GetNextAction();
+                Action nextAction = Models[CurrentDepth].GetNextAction();
 
                 if (nextAction != null)
                 {
@@ -84,6 +90,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                 }
             }
 
+            TotalActionCombinationsProcessed += processedActions;
             this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
             this.InProgress = false;
             return this.BestAction;
