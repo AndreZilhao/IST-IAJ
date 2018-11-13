@@ -28,7 +28,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
         public DepthLimitedGOAPDecisionMaking(CurrentStateWorldModel currentStateWorldModel, List<Action> actions, List<Goal> goals)
         {
-            this.ActionCombinationsProcessedPerFrame = 1000;
+            this.ActionCombinationsProcessedPerFrame = 200;
             this.Goals = goals;
             this.InitialWorldModel = currentStateWorldModel;
         }
@@ -74,6 +74,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                     CurrentDepth -= 1;
                     continue;
                 }
+
                 Action nextAction = Models[CurrentDepth].GetNextAction();
 
                 if (nextAction != null)

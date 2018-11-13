@@ -84,8 +84,8 @@ namespace Assets.Scripts
 
             //initialize your pathfinding algorithm here!
             //use goalBoundingPathfinding for a more efficient algorithm
-            //this.Initialize(NavigationManager.Instance.NavMeshGraphs[0], new GoalBoundingPathfinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclideanHeuristic(), goalBoundsTable));
-            this.Initialize(NavigationManager.Instance.NavMeshGraphs[0], new NodeArrayAStarPathFinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclideanHeuristic()));
+            this.Initialize(NavigationManager.Instance.NavMeshGraphs[0], new GoalBoundingPathfinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclideanHeuristic(), goalBoundsTable));
+            //this.Initialize(NavigationManager.Instance.NavMeshGraphs[0], new NodeArrayAStarPathFinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclideanHeuristic()));
 
 
             //initialization of the GOB decision making
