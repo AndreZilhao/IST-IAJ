@@ -4,13 +4,14 @@ using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using Assets.Scripts.IAJ.Unity.Movement.DynamicMovement;
 using Assets.Scripts.IAJ.Unity.Pathfinding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics;
-using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures;
+using Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding;
 using RAIN.Navigation;
 using RAIN.Navigation.NavMesh;
 using UnityEngine;
 using UnityEngine.UI;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Path;
 using Assets.Scripts.GameManager;
+using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding;
 
 namespace Assets.Scripts
 {
@@ -34,6 +35,7 @@ namespace Assets.Scripts
         public Text ProcessedActionsText;
         public Text BestActionText;
         public bool MCTSActive;
+        public GoalBoundingTable goalBoundsTable;
 
 
         public Goal BeQuickGoal { get; private set; }
@@ -46,7 +48,6 @@ namespace Assets.Scripts
         public DynamicCharacter Character { get; private set; }
         public DepthLimitedGOAPDecisionMaking GOAPDecisionMaking { get; set; }
         public AStarPathFinding AStarPathFinding;
-        public StraightLinePathSmoothing straightLinePathSmoothing;
 
         //private fields for internal use only
         private Vector3 startPosition;
@@ -69,7 +70,7 @@ namespace Assets.Scripts
             this.draw = true;
             this.navMesh = navMeshGraph;
             this.AStarPathFinding = pathFindingAlgorithm;
-            this.AStarPathFinding.NodesPerSearch = 100;
+            this.AStarPathFinding.NodesPerSearch = 2000;
 
 			this.characterAnimator = this.GetComponentInChildren<Animator> ();
         }
@@ -82,8 +83,9 @@ namespace Assets.Scripts
             this.Character = new DynamicCharacter(this.gameObject);
 
             //initialize your pathfinding algorithm here!
-       		//use goalBoundingPathfinding for a more efficient algorithm
-			this.Initialize(NavigationManager.Instance.NavMeshGraphs[0], new NodeArrayAStarPathFinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclideanHeuristic())); 
+            //use goalBoundingPathfinding for a more efficient algorithm
+            //this.Initialize(NavigationManager.Instance.NavMeshGraphs[0], new GoalBoundingPathfinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclideanHeuristic(), goalBoundsTable));
+            this.Initialize(NavigationManager.Instance.NavMeshGraphs[0], new NodeArrayAStarPathFinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclideanHeuristic()));
 
 
             //initialization of the GOB decision making
@@ -217,11 +219,13 @@ namespace Assets.Scripts
             if (this.AStarPathFinding.InProgress)
             {
                 var finished = this.AStarPathFinding.Search(out this.currentSolution);
+               
                 if (finished && this.currentSolution != null)
                 {
+                    Debug.Log("I'm here");
                     //lets smooth out the Path
                     this.startPosition = this.Character.KinematicData.position;
-					this.currentSmoothedSolution = straightLinePathSmoothing.SmoothPath(this.Character.KinematicData.position, this.currentSolution);
+					this.currentSmoothedSolution = StraightLinePathSmoothing.SmoothPath(this.Character.KinematicData.position, this.currentSolution);
                     this.currentSmoothedSolution.CalculateLocalPathsFromPathPositions(this.Character.KinematicData.position);
 					this.Character.Movement = new DynamicFollowPath(this.Character.KinematicData, this.currentSmoothedSolution)
                     {

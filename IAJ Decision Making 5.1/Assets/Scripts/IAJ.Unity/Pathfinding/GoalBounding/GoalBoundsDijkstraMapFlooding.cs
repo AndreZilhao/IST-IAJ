@@ -99,6 +99,7 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding
             {
                 childNodeRecord.parent = parent;
                 childNodeRecord.gValue = g;
+                childNodeRecord.fValue = g;
                 childNodeRecord.StartNodeOutConnectionIndex = startIndex;
                 Open.AddToOpen(childNodeRecord);
             }
@@ -106,6 +107,7 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding
             {
                 childNodeRecord.parent = parent;
                 childNodeRecord.gValue = g;
+                childNodeRecord.fValue = g;
                 childNodeRecord.StartNodeOutConnectionIndex = startIndex;
                 Open.Replace(nodeInOpen, childNodeRecord);
             }
