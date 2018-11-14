@@ -54,7 +54,10 @@ namespace Assets.Scripts.DecisionMakingActions
             var surviveValue = worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL);
             worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, surviveValue - this.hpChange);
 
-            worldModel.SetProperty(Properties.HP, Properties.MAXHP);
+
+            var hp = (int)worldModel.GetProperty(Properties.MAXHP);
+
+            worldModel.SetProperty(Properties.HP,hp);
             //disables the target object so that it can't be reused again
             worldModel.SetProperty(this.Target.name, false);
         }

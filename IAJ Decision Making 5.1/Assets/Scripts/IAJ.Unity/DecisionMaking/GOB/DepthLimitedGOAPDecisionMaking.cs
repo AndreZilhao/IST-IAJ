@@ -28,7 +28,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
         public DepthLimitedGOAPDecisionMaking(CurrentStateWorldModel currentStateWorldModel, List<Action> actions, List<Goal> goals)
         {
-            this.ActionCombinationsProcessedPerFrame = 200;
+            this.ActionCombinationsProcessedPerFrame = 10000;
             this.Goals = goals;
             this.InitialWorldModel = currentStateWorldModel;
         }
@@ -56,7 +56,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             var startTime = Time.realtimeSinceStartup;
 
             BestAction = null;
-			BestDiscontentmentValue = int.MaxValue;
+			BestDiscontentmentValue = float.MaxValue;
 
             while (CurrentDepth >= 0 && processedActions < ActionCombinationsProcessedPerFrame)
             {
