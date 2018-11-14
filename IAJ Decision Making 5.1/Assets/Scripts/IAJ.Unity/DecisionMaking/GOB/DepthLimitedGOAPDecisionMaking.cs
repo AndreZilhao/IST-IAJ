@@ -56,10 +56,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             var startTime = Time.realtimeSinceStartup;
 
             BestAction = null;
+            var returnAction = BestAction;
 			BestDiscontentmentValue = float.MaxValue;
 
-            while (CurrentDepth >= 0 && processedActions < ActionCombinationsProcessedPerFrame)
+            while (CurrentDepth >= 0)   // processedActions < ActionCombinationsProcessedPerFrame
             {
+                if (processedActions >= ActionCombinationsProcessedPerFrame)
+                    return null;
                 if (CurrentDepth >= MAX_DEPTH)
                 {
                     processedActions++;
