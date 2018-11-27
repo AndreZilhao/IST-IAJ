@@ -26,8 +26,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
         private MCTSNode InitialNode { get; set; }
         private System.Random RandomGenerator { get; set; }
-        
-        
+
+
 
         public MCTS(CurrentStateWorldModel currentStateWorldModel)
         {
@@ -120,17 +120,26 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         // usado na exploração
         private MCTSNode BestUCTChild(MCTSNode node)
         {
-            float utility = (node.Q / node.N) + C * Mathf.Sqrt(Mathf.Log(node.Parent.N/node.N));
-            
-            throw new NotImplementedException();
+            MCTSNode bestChild = null;
+            float bestUtility = 0;
+            foreach (MCTSNode childNode in node.ChildNodes)
+            {
+                float utility = (node.Q / node.N) + C * Mathf.Sqrt(Mathf.Log(node.Parent.N) / node.N);
+                if (utility > bestUtility)
+                {
+                    bestUtility = utility;
+                    bestChild = childNode;
+                }
+            }
+            return bestChild;
         }
 
         //this method is very similar to the bestUCTChild, but it is used to return the final action of the MCTS search, and so we do not care about
         //the exploration factor //RETORNAR NO FINAL, SEM TER EM CONTA A EXPLORAÇÃO (podemos obter isto através do numero de explorações feitas (BEST CHOICE), ou melhor Q/N)
         private MCTSNode BestChild(MCTSNode node)
         {
-            //TODO: implement
-            throw new NotImplementedException();
+            return BestUCTChild(node);
+            //for now simply use the UCT method 
         }
     }
 }
