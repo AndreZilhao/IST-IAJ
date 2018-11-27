@@ -76,9 +76,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             MCTSNode currentNode = initialNode;
             MCTSNode bestChild;
 
-
-            //TODO: implement
-            throw new NotImplementedException();
+            while (!currentNode.State.IsTerminal())
+            {
+                nextAction = currentNode.State.GetNextAction();
+                if (nextAction != null)
+                {
+                    return Expand(currentNode, nextAction);
+                }
+                else
+                {
+                    currentNode = BestUCTChild(currentNode);
+                }
+            }
+            return currentNode;
         }
 
         private Reward Playout(WorldModel initialPlayoutState)
@@ -95,15 +105,23 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private MCTSNode Expand(MCTSNode parent, GOB.Action action)
         {
-            //TODO: implement
-            throw new NotImplementedException();
+            MCTSNode childNode = new MCTSNode(parent.State)
+            {
+                Action = action,
+                Parent = parent,
+                PlayerID = 0,
+            };
+            childNode.Action.ApplyActionEffects(childNode.State);
+            parent.ChildNodes.Add(childNode);
+            return childNode;
         }
 
         //gets the best child of a node, using the UCT formula
         // usado na exploração
         private MCTSNode BestUCTChild(MCTSNode node)
         {
-            //TODO: implement
+            float utility = (node.Q / node.N) + C * Mathf.Sqrt(Mathf.Log(node.Parent.N/node.N));
+            
             throw new NotImplementedException();
         }
 
