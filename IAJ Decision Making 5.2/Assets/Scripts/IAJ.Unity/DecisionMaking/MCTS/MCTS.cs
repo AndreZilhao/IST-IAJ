@@ -65,9 +65,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             var startTime = Time.realtimeSinceStartup;
             this.CurrentIterationsInFrame = 0;
+            MCTSNode node = InitialNode;
+            while (CurrentIterationsInFrame < MaxIterationsProcessedPerFrame)
+            {
+                node = Selection(InitialNode);
+                reward = Playout(node.State);
+                Backpropagate(node, reward);
+                CurrentIterationsInFrame++;
+            }
 
-            //TODO: implement
-            throw new NotImplementedException();
+            BestFirstChild = BestChild(InitialNode);
+            return BestFirstChild.Action;
         }
 
         private MCTSNode Selection(MCTSNode initialNode)
@@ -93,14 +101,32 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private Reward Playout(WorldModel initialPlayoutState)
         {
-            //TODO: implement
-            throw new NotImplementedException();
+            WorldModel state = initialPlayoutState.GenerateChildWorldModel();
+
+            while (!state.IsTerminal())
+            {
+                GOB.Action[] actions = state.GetExecutableActions();
+                int randomAction = RandomGenerator.Next(actions.Length);
+                actions[randomAction].ApplyActionEffects(state);
+            }
+
+            Reward reward = new Reward
+            {
+                PlayerID = 0,
+                Value = state.GetScore(),
+
+            };
+            return reward;
         }
 
         private void Backpropagate(MCTSNode node, Reward reward)
         {
-            //TODO: implement
-            throw new NotImplementedException();
+            while (node != null)
+            {
+                node.N++;
+                node.Q += reward.Value;
+                node = node.Parent;
+            }
         }
 
         private MCTSNode Expand(MCTSNode parent, GOB.Action action)
