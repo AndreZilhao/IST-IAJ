@@ -33,8 +33,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 100;
-            this.MaxIterationsProcessedPerFrame = 10;
+            this.MaxIterations = 1000;
+            this.MaxIterationsProcessedPerFrame = 1000; //use 10 or 100 for dumber player
             this.RandomGenerator = new System.Random();
         }
 
@@ -65,16 +65,32 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             var startTime = Time.realtimeSinceStartup;
             this.CurrentIterationsInFrame = 0;
-            MCTSNode node = InitialNode;
-            while (CurrentIterationsInFrame < MaxIterationsProcessedPerFrame)
+            while (CurrentIterations < MaxIterations)
             {
-                node = Selection(InitialNode);
-                reward = Playout(node.State);
-                Backpropagate(node, reward);
+                if (CurrentIterationsInFrame >= MaxIterationsProcessedPerFrame)
+                {
+                    Debug.Log("Need more time");
+                    return null;
+                }
+                
+                selectedNode = Selection(InitialNode);
+                if (selectedNode == InitialNode)
+                    break; //avoid infinite loops in 1 sized tree
+                reward = Playout(selectedNode.State);
+                Backpropagate(selectedNode, reward);
                 CurrentIterationsInFrame++;
+                CurrentIterations++;
             }
 
             BestFirstChild = BestChild(InitialNode);
+            MCTSNode child = BestFirstChild;
+            BestActionSequence.Clear();
+            while (child != null)
+            {
+                BestActionSequence.Add(child.Action);
+                child = BestChild(child);
+            }
+            InProgress = false;
             return BestFirstChild.Action;
         }
 
@@ -82,7 +98,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             GOB.Action nextAction;
             MCTSNode currentNode = initialNode;
-            MCTSNode bestChild;
+            MCTSNode bestChild; //should I use this?
 
             while (!currentNode.State.IsTerminal())
             {
@@ -131,7 +147,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private MCTSNode Expand(MCTSNode parent, GOB.Action action)
         {
-            MCTSNode childNode = new MCTSNode(parent.State)
+            MCTSNode childNode = new MCTSNode(parent.State.GenerateChildWorldModel())
             {
                 Action = action,
                 Parent = parent,
@@ -150,7 +166,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             float bestUtility = 0;
             foreach (MCTSNode childNode in node.ChildNodes)
             {
-                float utility = (node.Q / node.N) + C * Mathf.Sqrt(Mathf.Log(node.Parent.N) / node.N);
+                float utility = (childNode.Q / childNode.N) + C * Mathf.Sqrt(Mathf.Log(node.N) / childNode.N);
                 if (utility > bestUtility)
                 {
                     bestUtility = utility;
@@ -165,7 +181,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private MCTSNode BestChild(MCTSNode node)
         {
             return BestUCTChild(node);
-            //for now simply use the UCT method 
+            //for now simply use the UCT method, will replace later with most explored child
         }
     }
 }
