@@ -33,8 +33,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 5000;
-            this.MaxIterationsProcessedPerFrame = 5000; //use 10 or 100 for dumber player
+            this.MaxIterations = 1000;
+            this.MaxIterationsProcessedPerFrame = 1000; //use 10 or 100 for dumber player
             this.RandomGenerator = new System.Random();
         }
 
@@ -117,22 +117,42 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private Reward Playout(WorldModel initialPlayoutState)
         {
-            WorldModel state = initialPlayoutState.GenerateChildWorldModel();
+            WorldModel prevState = initialPlayoutState.GenerateChildWorldModel();
 
-            while (!state.IsTerminal())
+            //Perform n playouts on the next state [Possible solution to deal with stochastic nature]
+            int n = 0;
+            while (!prevState.IsTerminal())
             {
-                GOB.Action[] actions = state.GetExecutableActions();
+                GOB.Action[] actions = prevState.GetExecutableActions();
                 int randomAction = RandomGenerator.Next(actions.Length);
-                actions[randomAction].ApplyActionEffects(state);
-                state.CalculateNextPlayer();
+                if (actions[randomAction].Name.Contains("SwordAttack") && n > 0)
+                { 
+                    WorldModel[] testStates = new WorldModel[n];
+                    for (int i = 0; i < n; i++) //change limit to n > 0
+                    {
+                        testStates[i] = prevState.GenerateChildWorldModel();
+                        actions[randomAction].ApplyActionEffects(testStates[i]);
+                        //testStates[i].DumpState();
+                    }
+                    prevState = MergeStates(testStates, actions[randomAction].Name);
+                } else
+                {
+                    prevState = prevState.GenerateChildWorldModel();
+                    actions[randomAction].ApplyActionEffects(prevState);
+                }
+                //Debug.Log("Resulting");
+                //prevState.DumpState();
+                prevState.CalculateNextPlayer();
             }
 
-            Reward reward = new Reward
+            Reward reward = new Reward();
+            reward.PlayerID = prevState.GetNextPlayer();
+            reward.Value = 0;
+            if ((int)prevState.GetProperty(Properties.HP) >= 0)
             {
-                PlayerID = 0,
-                Value = state.GetScore(),
-
-            };
+                reward.Value = 0.1f;
+            }
+                
             return reward;
         }
 
@@ -184,6 +204,51 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             return BestUCTChild(node);
             //for now simply use the UCT method, will replace later with most explored child
+        }
+
+
+        //method to average out and apply the effects of a sword attack playout in a stochastic world
+        private WorldModel MergeStates(WorldModel[] testStates, string enemy)
+        {
+            int hp = 0;
+            int shieldHP = 0;
+            int enemyDeadCount = 0;
+            bool enemyAlive = true;
+            int xp = 0;
+            int n = testStates.Length;
+
+            //Tokenizing the enemy string
+            enemy = enemy.Remove(0, 11);
+            enemy = enemy.Replace("(", "");
+            enemy = enemy.Replace(")", "");
+
+            for (int i = 0; i < n; i++)
+            {
+                hp += (int) testStates[i].GetProperty(Properties.HP);
+                shieldHP += (int) testStates[i].GetProperty(Properties.SHIELDHP);
+                xp += (int)testStates[i].GetProperty(Properties.XP);
+                if ((bool)testStates[i].GetProperty(enemy) != true) enemyDeadCount++;
+            }
+
+            hp = hp / n;
+            shieldHP = shieldHP / n;
+
+            if (enemyDeadCount > ((float)n / 2)) //enemy is dead on average, rounded up
+            {
+                xp = xp / enemyDeadCount;
+                enemyAlive = false;
+            } else
+            {
+                xp = 0;
+            }
+
+            //returning the testState[0] as the resulting average
+            WorldModel returnState = testStates[0];
+            returnState.SetProperty(Properties.HP, hp);
+            returnState.SetProperty(Properties.SHIELDHP, shieldHP);
+            returnState.SetProperty(enemy, enemyAlive);
+            returnState.SetProperty(Properties.XP, xp);
+            return returnState;
         }
     }
 }
