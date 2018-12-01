@@ -1,4 +1,4 @@
-using Assets.Scripts.IAJ.Unity.Movement.DynamicMovement;
+﻿using Assets.Scripts.IAJ.Unity.Movement.DynamicMovement;
 using Assets.Scripts.IAJ.Unity.Utils;
 using System.Collections.Generic;
 using System.Linq;
