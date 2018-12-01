@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
@@ -67,6 +68,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             {
                 return 0;
             }
+        }
+
+        //State visualization
+        public virtual void DumpState()
+        {
+            string str = "";
+            foreach (var item in Properties)
+            {
+                str += "|" + item.Key + ": " + item.Value + " ";
+            }
+            Debug.Log(str);
         }
 
         public virtual void SetGoalValue(string goalName, float value)

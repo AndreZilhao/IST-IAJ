@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.IAJ.Unity.Movement.DynamicMovement;
+using Assets.Scripts.IAJ.Unity.Movement.DynamicMovement;
 using Assets.Scripts.IAJ.Unity.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,12 +79,12 @@ namespace Assets.Scripts.GameManager
                         this.currentEnemy = enemy; 
                         this.enemyCharacter = new DynamicCharacter(enemy)
                         {
-                            MaxSpeed = 100
+                            MaxSpeed = 300
                         };
                         enemyCharacter.Movement = new DynamicSeek()
                         {
                             Character = enemyCharacter.KinematicData,
-                            MaxAcceleration = 100,
+                            MaxAcceleration = 300,
                             Target = new IAJ.Unity.Movement.KinematicData()
                         };
 
