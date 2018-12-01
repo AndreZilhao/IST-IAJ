@@ -124,7 +124,9 @@ namespace Assets.Scripts
             this.Actions = new List<Action>();
 
             this.Actions.Add(new ShieldOfFaith(this));
-
+            this.Actions.Add(new LevelUp(this));
+            this.Actions.Add(new LayOnHands(this));
+            this.Actions.Add(new DivineWrath(this));
 
             foreach (var chest in GameObject.FindGameObjectsWithTag("Chest"))
             {

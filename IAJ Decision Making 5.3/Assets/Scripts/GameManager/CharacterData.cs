@@ -23,7 +23,7 @@ namespace Assets.Scripts.GameManager
             this.Mana = 0;
             this.Money = 0;
             this.Time = 0;
-            this.XP = 0;
+            this.XP = 9;
             this.Level = 1;
         }
     }

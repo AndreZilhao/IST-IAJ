@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.GOB.Action;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
@@ -16,6 +17,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public int MaxIterationsProcessedPerFrame { get; set; }
         public int MaxPlayoutDepthReached { get; private set; }
         public int MaxSelectionDepthReached { get; private set; }
+        public int MaxPlayoutDepthAllowed { get; private set; }
         public float TotalProcessingTime { get; private set; }
         public MCTSNode BestFirstChild { get; set; }
         public List<GOB.Action> BestActionSequence { get; private set; }
@@ -27,7 +29,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
         private MCTSNode[] InitialNodes { get; set; }
-        private System.Random RandomGenerator { get; set; }
+        protected System.Random RandomGenerator { get; set; }
 
 
 
@@ -38,6 +40,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.MaxIterations = 1000;
             this.NumberOfRuns = 5;
             this.MaxIterationsProcessedPerFrame = 250;
+            this.MaxPlayoutDepthAllowed = 5;
             this.RandomGenerator = new System.Random();
         }
 
@@ -109,7 +112,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             MCTSNode bestChild; //should I use this?
 
             while (!currentNode.State.IsTerminal())
-            {
+            { 
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null)
                 {
@@ -123,16 +126,18 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return currentNode;
         }
 
-        private Reward Playout(WorldModel initialPlayoutState)
+        virtual protected Reward Playout(WorldModel initialPlayoutState)
         {
             WorldModel prevState = initialPlayoutState.GenerateChildWorldModel();
-
+            CurrentDepth = 0;
             //Perform n playouts on the next state [Possible solution to deal with stochastic nature]
             int n = 0; //change n to > 0 to enable this feature
-            while (!prevState.IsTerminal())
+            while (!prevState.IsTerminal() && CurrentDepth < MaxPlayoutDepthAllowed)
             {
                 GOB.Action[] actions = prevState.GetExecutableActions();
+
                 int randomAction = RandomGenerator.Next(actions.Length);
+                //Debug.Log(actions[randomAction].Name);
                 if (actions[randomAction].Name.Contains("SwordAttack") && n > 0)
                 {
                     WorldModel[] testStates = new WorldModel[n];
@@ -140,7 +145,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     {
                         testStates[i] = prevState.GenerateChildWorldModel();
                         actions[randomAction].ApplyActionEffects(testStates[i]);
-                        //testStates[i].DumpState();
                     }
                     prevState = MergeStates(testStates, actions[randomAction].Name);
                 }
@@ -152,16 +156,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 //Debug.Log("Resulting");
                 //prevState.DumpState();
                 prevState.CalculateNextPlayer();
+                CurrentDepth++;
             }
-
-            Reward reward = new Reward();
-            reward.PlayerID = prevState.GetNextPlayer();
-            reward.Value = 0;
-            if ((int)prevState.GetProperty(Properties.MANA) > 0)
-            {
-                reward.Value = 1f;
-            }
-
+            //Debug.Log("CurrentDepth:" + CurrentDepth);
+            Reward reward = new Reward(prevState, prevState.GetNextPlayer());
             return reward;
         }
 
@@ -233,6 +231,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             foreach (MCTSNode n in nodes)
             {
                 MCTSNode b = BestChild(n);
+                //Debug.Log(b.Action.Name);
+                //Debug.Log("n:" + b.N + "q:" + b.Q);
                 if (dict.ContainsKey(b.Action.Name))
                 {
                     dict[b.Action.Name] += b.N;
