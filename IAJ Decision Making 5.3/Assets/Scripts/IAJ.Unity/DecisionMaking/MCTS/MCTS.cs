@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.GOB.Action;
+using PickUpChest = Assets.Scripts.DecisionMakingActions.PickUpChest;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
@@ -18,7 +19,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public int MaxPlayoutDepthReached { get; private set; }
         public int MaxSelectionDepthReached { get; private set; }
         public int MaxPlayoutDepthAllowed { get; private set; }
+        public int MaxPlayoutSimulations { get; private set; }
         public float TotalProcessingTime { get; private set; }
+        public int TotalNodesExpanded { get; private set; }
+        public int TotalPlayouts { get; private set; }
         public MCTSNode BestFirstChild { get; set; }
         public List<GOB.Action> BestActionSequence { get; private set; }
 
@@ -41,6 +45,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.NumberOfRuns = 8;
             this.MaxIterationsProcessedPerFrame = 100;
             this.MaxPlayoutDepthAllowed = 5;
+            this.MaxPlayoutSimulations = 0; // zero to disable
             this.RandomGenerator = new System.Random();
         }
 
@@ -50,6 +55,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.MaxPlayoutDepthReached = 0;
             this.MaxSelectionDepthReached = 0;
             this.CurrentIterations = 0;
+            this.TotalPlayouts = 0;
             this.CurrentIterationsInFrame = 0;
             this.TotalProcessingTime = 0.0f;
             this.CurrentStateWorldModel.Initialize();
@@ -77,6 +83,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 if (CurrentIterationsInFrame >= MaxIterationsProcessedPerFrame)
                 {
+                    TotalProcessingTime += Time.realtimeSinceStartup - startTime;
                     return null;
                 }
 
@@ -91,7 +98,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 if (currentMCTS == NumberOfRuns) currentMCTS = 0;
             }
 
-            BestFirstChild = BestChildFromSeveral(InitialNodes); ;
+            BestFirstChild = BestChildFromSeveral(InitialNodes);
             MCTSNode child = BestFirstChild;
             BestActionSequence.Clear();
             while (child != null)
@@ -102,7 +109,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             InProgress = false;
             if (BestFirstChild != null)
             {
-                Debug.Log(BestFirstChild.Action.Name);
+                TotalProcessingTime += Time.realtimeSinceStartup - startTime;
                 return BestFirstChild.Action;
             }
             return null;
@@ -112,13 +119,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             GOB.Action nextAction;
             MCTSNode currentNode = initialNode;
-            MCTSNode bestChild; //should I use this?
 
             while (!currentNode.State.IsTerminal())
             { 
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null)
                 {
+                    TotalNodesExpanded++;
                     return Expand(currentNode, nextAction);
                 }
                 else
@@ -133,35 +140,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             WorldModel prevState = initialPlayoutState.GenerateChildWorldModel();
             CurrentDepth = 0;
-            //Perform n playouts on the next state [Possible solution to deal with stochastic nature]
-            int n = 5; //change n to > 0 to enable this feature
+            //Perform n playouts for each state [to deal with stochastic nature]
             while (!prevState.IsTerminal() && CurrentDepth < MaxPlayoutDepthAllowed)
             {
                 GOB.Action[] actions = prevState.GetExecutableActions();
-
                 int randomAction = RandomGenerator.Next(actions.Length);
-                //Debug.Log(actions[randomAction].Name);
-                if (actions[randomAction].Name.Contains("SwordAttack") && n > 0)
-                {
-                    WorldModel[] testStates = new WorldModel[n];
-                    for (int i = 0; i < n; i++) 
-                    {
-                        testStates[i] = prevState.GenerateChildWorldModel();
-                        actions[randomAction].ApplyActionEffects(testStates[i]);
-                    }
-                    prevState = MergeStates(testStates, actions[randomAction].Name);
-                }
-                else
-                {
-                    prevState = prevState.GenerateChildWorldModel();
-                    actions[randomAction].ApplyActionEffects(prevState);
-                }
-                //Debug.Log("Resulting");
-                //prevState.DumpState();
+                prevState = StochasticPlayout(actions[randomAction], prevState, MaxPlayoutSimulations);
                 prevState.CalculateNextPlayer();
                 CurrentDepth++;
             }
-            //Debug.Log("CurrentDepth:" + CurrentDepth);
             Reward reward = new Reward(prevState, prevState.GetNextPlayer());
             return reward;
         }
@@ -229,6 +216,24 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private MCTSNode BestChildFromSeveral(MCTSNode[] nodes)
         {
             if (nodes[0].ChildNodes.Count == 0) return null;
+            //Consider no-brainer actions as always the best child. (pick-up nearby chest/level-up)
+            foreach (MCTSNode n in nodes[0].ChildNodes)
+            {
+                if (n.Action.Name == "LevelUp")
+                {
+                    Debug.Log("I'm levelin' cause it's cool");
+                    return n;
+                }
+                if (n.Action.GetType().Equals(typeof(PickUpChest)))
+                {
+                    
+                    if (n.Action.GetDuration(nodes[0].State) < 0.8f)
+                    {
+                        Debug.Log("I'm chestin' cause it's cool");
+                        return n;
+                    }
+                }
+            }
             //find the overall best action and store it in 'max'
             Dictionary<string, int> dict = new Dictionary<string, int>();
             foreach (MCTSNode n in nodes)
@@ -302,6 +307,30 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             returnState.SetProperty(enemy, enemyAlive);
             returnState.SetProperty(Properties.XP, xp);
             return returnState;
+        }
+
+        //Simulates one or many playouts of an action in a state. Only applies to swordattack as all other actions are not stochastic.
+        //Afterwards merges them in MergeStates to average out the results.
+        protected WorldModel StochasticPlayout(Action action, WorldModel prevState, int n)
+        {
+            if (action.Name.Contains("SwordAttack") && n > 0)
+            {
+                WorldModel[] testStates = new WorldModel[n];
+                for (int i = 0; i < n; i++)
+                {
+                    TotalPlayouts++;
+                    testStates[i] = prevState.GenerateChildWorldModel();
+                    action.ApplyActionEffects(testStates[i]);
+                }
+                prevState = MergeStates(testStates, action.Name);
+            }
+            else
+            {
+                TotalPlayouts++;
+                prevState = prevState.GenerateChildWorldModel();
+                action.ApplyActionEffects(prevState);
+            }
+            return prevState;
         }
     }
 }

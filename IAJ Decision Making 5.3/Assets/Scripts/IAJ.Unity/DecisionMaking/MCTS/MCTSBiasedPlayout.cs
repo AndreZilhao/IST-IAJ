@@ -46,6 +46,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     if (pair.Key > randomValue)
                     {
                         //Debug.Log("Action selected: "+ pair.Value.Name + "Random: " + randomValue + "pair.key: " + pair.Key);
+                        state = StochasticPlayout(pair.Value, state, MaxPlayoutSimulations);
                         pair.Value.ApplyActionEffects(state);
                         break;
                     }
