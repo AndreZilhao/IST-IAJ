@@ -23,9 +23,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public List<GOB.Action> BestActionSequence { get; private set; }
 
 
-        private int CurrentIterations { get; set; }
-        private int CurrentIterationsInFrame { get; set; }
-        private int CurrentDepth { get; set; }
+        protected int CurrentIterations { get; set; }
+        protected int CurrentIterationsInFrame { get; set; }
+        protected int CurrentDepth { get; set; }
 
         private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
         private MCTSNode[] InitialNodes { get; set; }
@@ -37,9 +37,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 1000;
-            this.NumberOfRuns = 5;
-            this.MaxIterationsProcessedPerFrame = 250;
+            this.MaxIterations = 2000;
+            this.NumberOfRuns = 8;
+            this.MaxIterationsProcessedPerFrame = 100;
             this.MaxPlayoutDepthAllowed = 5;
             this.RandomGenerator = new System.Random();
         }
@@ -101,7 +101,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             }
             InProgress = false;
             if (BestFirstChild != null)
+            {
+                Debug.Log(BestFirstChild.Action.Name);
                 return BestFirstChild.Action;
+            }
             return null;
         }
 
@@ -131,7 +134,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             WorldModel prevState = initialPlayoutState.GenerateChildWorldModel();
             CurrentDepth = 0;
             //Perform n playouts on the next state [Possible solution to deal with stochastic nature]
-            int n = 0; //change n to > 0 to enable this feature
+            int n = 5; //change n to > 0 to enable this feature
             while (!prevState.IsTerminal() && CurrentDepth < MaxPlayoutDepthAllowed)
             {
                 GOB.Action[] actions = prevState.GetExecutableActions();

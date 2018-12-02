@@ -47,5 +47,11 @@ namespace Assets.Scripts.DecisionMakingActions {
             var mana = (int)worldModel.GetProperty(Properties.MANA);
             worldModel.SetProperty(Properties.MANA, mana - 10);
         }
+
+        public override float GetHValue(WorldModel worldModel)
+        {
+            //this is OP
+            return 200.0f;
+        }
     }
 }

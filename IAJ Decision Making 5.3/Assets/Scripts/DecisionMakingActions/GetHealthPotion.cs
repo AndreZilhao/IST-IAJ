@@ -61,5 +61,16 @@ namespace Assets.Scripts.DecisionMakingActions
             //disables the target object so that it can't be reused again
             worldModel.SetProperty(this.Target.name, false);
         }
+
+        public override float GetHValue(WorldModel worldModel)
+        {
+            float distance = Vector3.Distance(Character.transform.position, Target.transform.position);
+            float distanceBonus = 10.0f - (float)((distance * 10.0f) / 530);
+
+            int hp = (int)worldModel.GetProperty(Properties.HP);
+            int maxhp = (int)worldModel.GetProperty(Properties.MAXHP);
+            // 0 a 100
+            return 100.0f - (float)((hp * 100) / maxhp) + distanceBonus;
+        }
     }
 }

@@ -63,7 +63,7 @@ namespace Assets.Scripts.DecisionMakingActions
         public override float GetHValue(WorldModel worldModel)
         {
             //you would be dumb not to level up if possible
-            return 200f;
+            return 200.0f;
         }
     }
 }

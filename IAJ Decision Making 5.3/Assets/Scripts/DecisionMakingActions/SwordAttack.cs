@@ -106,5 +106,48 @@ namespace Assets.Scripts.DecisionMakingActions
                 worldModel.SetGoalValue(AutonomousCharacter.GAIN_XP_GOAL, xpValue - this.xpChange);
             }
         }
+
+        public override float GetHValue(WorldModel worldModel)
+        {
+            float distance = Vector3.Distance(Character.transform.position, Target.transform.position);
+            float distanceBonus = 10.0f - (float)((distance * 10.0f) / 530);
+
+            int level = (int)worldModel.GetProperty(Properties.LEVEL);
+
+            if (level == 3)
+                return 0.0f;
+
+            else if (level == 2)
+            {
+                if (Target.tag.Equals("Skeleton"))
+                {
+                    return 50.0f + distanceBonus;
+                }
+                else if (Target.tag.Equals("Orc"))
+                {
+                    return 20.0f + distanceBonus;
+                }
+                else if (Target.tag.Equals("Dragon"))
+                {
+                    return 0.0f;
+                }
+            }
+            else
+            {
+                if (Target.tag.Equals("Skeleton"))
+                {
+                    return 30.0f + distanceBonus;
+                }
+                else if (Target.tag.Equals("Orc"))
+                {
+                    return 0.0f;
+                }
+                else if (Target.tag.Equals("Dragon"))
+                {
+                    return 0.0f;
+                }
+            }
+            return 0.0f;
+        }
     }
 }

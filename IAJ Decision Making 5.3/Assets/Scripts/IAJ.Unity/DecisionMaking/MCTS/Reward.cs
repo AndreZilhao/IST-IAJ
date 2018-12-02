@@ -15,6 +15,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         float xp;
         float enemiesKilled;
         float coinsCollected;
+        float time;
         public float Value { get; set; }
         public int PlayerID { get; set; }
 
@@ -25,6 +26,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.xp = (int)world.GetProperty(Properties.LEVEL);
             this.maxhp = (int)world.GetProperty(Properties.MAXHP);
             this.coinsCollected = (int)world.GetProperty(Properties.MONEY);
+            this.time = (float)world.GetProperty(Properties.TIME);
 
             for (int i = 0; i < 7; i++)
             {
@@ -38,12 +40,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             //Normalize the values
 
-            this.hp = hp / maxhp;
+            this.hp = hp / 30;
             this.xp = (xp - 1) / 2;
             this.enemiesKilled = enemiesKilled / 10;
             this.coinsCollected = coinsCollected / 25;
+            this.time = 1 - (time/200);
             {
-                Value = xp * 0.2f + hp * 0.3f + enemiesKilled * 0.3f + coinsCollected * 0f;
+                Value = xp * 0.2f + hp * 0.4f + enemiesKilled * 0.3f + coinsCollected * 0.0f + time*0.3f;
+                //Value = time;
             }
             
         }

@@ -60,5 +60,14 @@ namespace Assets.Scripts.DecisionMakingActions
             var mana = (int)worldModel.GetProperty(Properties.MANA);
             worldModel.SetProperty(Properties.MANA, mana - 5);
         }
+
+        public override float GetHValue(WorldModel worldModel)
+        {
+            return 0;
+            int hp = (int)worldModel.GetProperty(Properties.HP);
+            int maxhp = (int)worldModel.GetProperty(Properties.MAXHP);
+            // 0 a 80
+            return 80.0f - (float)((hp * 80) / maxhp);
+        }
     }
 }

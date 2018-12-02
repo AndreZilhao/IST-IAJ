@@ -16,7 +16,7 @@ namespace Assets.Scripts.DecisionMakingActions
             if (target.tag.Equals("Skeleton"))
             {
                 this.isSkeleton = true;
-                this.xpChange = 5;
+                this.xpChange = 3;
             }
         }
 
@@ -70,5 +70,17 @@ namespace Assets.Scripts.DecisionMakingActions
             worldModel.SetProperty(this.Target.name, false);
         }
 
+        public override float GetHValue(WorldModel worldModel)
+        {
+            float distance = Vector3.Distance(Character.transform.position, Target.transform.position);
+            float distanceBonus = 10.0f - (float)((distance * 10.0f) / 530);
+
+            int level = (int)worldModel.GetProperty(Properties.LEVEL);
+
+            if (level == 1)
+                return 100.0f + distanceBonus;
+            else
+                return 0.0f;
+        }
     }
 }

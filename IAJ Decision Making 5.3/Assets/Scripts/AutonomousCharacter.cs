@@ -14,6 +14,7 @@ using Assets.Scripts.IAJ.Unity.Pathfinding.Path;
 using Assets.Scripts.GameManager;
 using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Utils;
+using System.Linq;
 
 namespace Assets.Scripts
 {
@@ -161,13 +162,16 @@ namespace Assets.Scripts
 
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
             this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
-            this.MCTS = new MCTS(worldModel);
+            //this.MCTS = new MCTS(worldModel);
+            this.MCTS = new MCTSBiasedPlayout(worldModel);
         }
 
         void Update()
         {
             if (Time.time > this.nextUpdateTime || this.GameManager.WorldChanged)
             {
+                
+                this.MCTS = new MCTSBiasedPlayout(new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals));
                 this.GameManager.WorldChanged = false;
                 this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
 
@@ -213,7 +217,18 @@ namespace Assets.Scripts
 
             if (MCTSActive)
             {
-                this.UpdateMCTS();
+                //if chest in vicinity, then just get chest instead before considering other actions (we are considering chests + nearby enemy as atomic)
+                List<GameObject> chests = GameObject.FindGameObjectsWithTag("Chest").ToList();
+                foreach(var chest in chests)
+                {
+                    float distance = Vector3.Distance(Character.KinematicData.position, chest.transform.position);
+                    if (distance < 15.0f)
+                    {
+                        this.CurrentAction = new PickUpChest(this, chest);
+                    }
+                }
+                if(this.CurrentAction == null)
+                    this.UpdateMCTS();
             }
             else
             {
@@ -242,13 +257,12 @@ namespace Assets.Scripts
                     this.Character.Movement = new DynamicFollowPath(this.Character.KinematicData, this.currentSmoothedSolution)
                     {
                         MaxAcceleration = 200.0f,
-                        MaxSpeed = 40.0f
+                        MaxSpeed = 50.0f
                     };
                 }
             }
-
-
             this.Character.Update();
+
             //manage the character's animation
             if (this.Character.KinematicData.velocity.sqrMagnitude > 0.1)
             {
