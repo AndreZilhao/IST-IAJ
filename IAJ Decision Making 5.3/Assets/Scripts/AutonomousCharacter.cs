@@ -37,6 +37,7 @@ namespace Assets.Scripts
         public Text BestDiscontentmentText;
         public Text ProcessedActionsText;
         public Text BestActionText;
+        public Text PlayoutsText;
         public bool MCTSActive;
         public GoalBoundingTable goalBoundsTable;
 
@@ -52,6 +53,7 @@ namespace Assets.Scripts
         public DepthLimitedGOAPDecisionMaking GOAPDecisionMaking { get; set; }
         public MCTS MCTS { get; set; }
         public AStarPathFinding AStarPathFinding;
+        public int actionsPerformed;
 
         //private fields for internal use only
         private Vector3 startPosition;
@@ -75,7 +77,7 @@ namespace Assets.Scripts
             this.navMesh = navMeshGraph;
             this.AStarPathFinding = pathFindingAlgorithm;
             this.AStarPathFinding.NodesPerSearch = 2000;
-
+            this.actionsPerformed = 0;
             this.characterAnimator = this.GetComponentInChildren<Animator>();
         }
 
@@ -170,8 +172,8 @@ namespace Assets.Scripts
         {
             if (Time.time > this.nextUpdateTime || this.GameManager.WorldChanged)
             {
-                
                 this.MCTS = new MCTSBiasedPlayout(new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals));
+                //this.MCTS = new MCTS(new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals));
                 this.GameManager.WorldChanged = false;
                 this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
 
@@ -218,6 +220,7 @@ namespace Assets.Scripts
             if (MCTSActive)
             {
                 //if chest in vicinity, then just get chest instead before considering other actions (we are considering chests + nearby enemy as atomic)
+                /*
                 List<GameObject> chests = GameObject.FindGameObjectsWithTag("Chest").ToList();
                 foreach(var chest in chests)
                 {
@@ -227,6 +230,7 @@ namespace Assets.Scripts
                         this.CurrentAction = new PickUpChest(this, chest);
                     }
                 }
+                */
                 if(this.CurrentAction == null)
                     this.UpdateMCTS();
             }
@@ -286,9 +290,11 @@ namespace Assets.Scripts
                     this.CurrentAction = action;
                 }
             }
-            TotalProcessingTimeText.text = "Process. Time: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F");
-            BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
-            ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
+            TotalProcessingTimeText.text = "Process. Time: " + this.MCTS.TotalProcessingTime.ToString("F");
+            ProcessedActionsText.text = "Total Nodes Expanded: " + this.MCTS.TotalNodesExpanded.ToString();
+            PlayoutsText.text = "Playouts performed: " + this.MCTS.TotalPlayouts.ToString();
+            BestDiscontentmentText.text = "Actions performed: " + this.actionsPerformed.ToString();
+            
 
             if (MCTS.BestFirstChild != null)
             {
@@ -321,6 +327,7 @@ namespace Assets.Scripts
             this.TotalProcessingTimeText.text = "Process. Time: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F");
             this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
             this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
+
 
             if (this.GOAPDecisionMaking.BestAction != null)
             {

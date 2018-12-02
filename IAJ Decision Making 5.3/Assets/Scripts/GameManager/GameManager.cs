@@ -34,7 +34,7 @@ namespace Assets.Scripts.GameManager
         public bool WorldChanged { get; set; }
         private DynamicCharacter enemyCharacter;
         private GameObject currentEnemy;
- 
+
         private float nextUpdateTime = 0.0f;
         private Vector3 previousPosition;
 
@@ -52,7 +52,7 @@ namespace Assets.Scripts.GameManager
             this.enemies.AddRange(this.orcs);
             this.dragons = GameObject.FindGameObjectsWithTag("Dragon").ToList();
             this.enemies.AddRange(this.dragons);
-            
+
         }
 
         public void Update()
@@ -76,10 +76,10 @@ namespace Assets.Scripts.GameManager
                 {
                     if ((enemy.transform.position - this.character.transform.position).sqrMagnitude <= 100)
                     {
-                        this.currentEnemy = enemy; 
+                        this.currentEnemy = enemy;
                         this.enemyCharacter = new DynamicCharacter(enemy)
                         {
-                            MaxSpeed = 300
+                            MaxSpeed = 100
                         };
                         enemyCharacter.Movement = new DynamicSeek()
                         {
@@ -101,15 +101,24 @@ namespace Assets.Scripts.GameManager
             this.ManaText.text = "Mana: " + this.characterData.Mana;
             this.MoneyText.text = "Money: " + this.characterData.Money;
 
-            if(this.characterData.HP <= 0 || this.characterData.Time >= 200)
+            if (this.characterData.HP <= 0 || this.characterData.Time >= 200)
             {
-                this.GameEnd.SetActive(true);
+                if (!this.GameEnd.activeSelf)
+                    Debug.Log("Actions: " + this.autonomousCharacter.actionsPerformed
+                   + "|" + "Coins: " + this.characterData.Money
+                   + "|" + "Time: " + this.characterData.Time);
                 this.GameEnd.GetComponentInChildren<Text>().text = "Game Over";
-            }
-            else if(this.characterData.Money >= 25)
-            {
                 this.GameEnd.SetActive(true);
+            }
+            else if (this.characterData.Money >= 25)
+            {
+                if (!this.GameEnd.activeSelf)
+                    Debug.Log("Actions: " + this.autonomousCharacter.actionsPerformed
+                    + "|" + "Coins: " + this.characterData.Money
+                    + "|" + "Time: " + this.characterData.Time);
                 this.GameEnd.GetComponentInChildren<Text>().text = "Victory";
+                this.GameEnd.SetActive(true);
+
             }
         }
 
@@ -145,7 +154,7 @@ namespace Assets.Scripts.GameManager
                 //attack roll = D20 + attack modifier. Using 7 as attack modifier (+4 str modifier, +3 proficiency bonus)
                 int attackRoll = RandomHelper.RollD20() + 7;
 
-                if(attackRoll >= enemyAC)
+                if (attackRoll >= enemyAC)
                 {
                     //there was an hit, enemy is destroyed, gain xp
                     this.enemies.Remove(enemy);
@@ -161,7 +170,7 @@ namespace Assets.Scripts.GameManager
                 {
                     this.characterData.HP -= remainingDamage;
                 }
-
+                this.autonomousCharacter.actionsPerformed++;
                 this.WorldChanged = true;
             }
         }
@@ -179,9 +188,10 @@ namespace Assets.Scripts.GameManager
                 }
 
                 this.characterData.Mana -= 2;
-
+                this.autonomousCharacter.actionsPerformed++;
                 this.WorldChanged = true;
             }
+
         }
 
         public void ShieldOfFaith()
@@ -192,7 +202,9 @@ namespace Assets.Scripts.GameManager
                 this.characterData.Mana -= 5;
 
                 this.WorldChanged = true;
+                this.autonomousCharacter.actionsPerformed++;
             }
+
         }
 
         public void LayOnHands()
@@ -203,12 +215,14 @@ namespace Assets.Scripts.GameManager
                 this.characterData.Mana -= 7;
 
                 this.WorldChanged = true;
+                this.autonomousCharacter.actionsPerformed++;
             }
+
         }
 
         public void DivineWrath()
         {
-            if(this.characterData.Level >= 3 && this.characterData.Mana >= 10)
+            if (this.characterData.Level >= 3 && this.characterData.Mana >= 10)
             {
                 //kill all enemies in the map
                 foreach (var enemy in this.enemies)
@@ -232,7 +246,9 @@ namespace Assets.Scripts.GameManager
 
                 enemies.Clear();
                 this.WorldChanged = true;
+                this.autonomousCharacter.actionsPerformed++;
             }
+
         }
 
         public void PickUpChest(GameObject chest)
@@ -243,20 +259,24 @@ namespace Assets.Scripts.GameManager
                 Object.Destroy(chest);
                 this.characterData.Money += 5;
                 this.WorldChanged = true;
+                this.autonomousCharacter.actionsPerformed++;
             }
+
         }
 
         public void LevelUp()
         {
             if (this.characterData.Level >= 4) return;
 
-            if(this.characterData.XP >= this.characterData.Level*10)
+            if (this.characterData.XP >= this.characterData.Level * 10)
             {
                 this.characterData.Level++;
                 this.characterData.MaxHP += 10;
                 this.characterData.XP = 0;
                 this.WorldChanged = true;
+                this.autonomousCharacter.actionsPerformed++;
             }
+
         }
 
         public void GetManaPotion(GameObject manaPotion)
@@ -266,7 +286,9 @@ namespace Assets.Scripts.GameManager
                 Object.Destroy(manaPotion);
                 this.characterData.Mana = 10;
                 this.WorldChanged = true;
+                this.autonomousCharacter.actionsPerformed++;
             }
+
         }
 
         public void GetHealthPotion(GameObject potion)
@@ -276,7 +298,9 @@ namespace Assets.Scripts.GameManager
                 Object.Destroy(potion);
                 this.characterData.HP = this.characterData.MaxHP;
                 this.WorldChanged = true;
+                this.autonomousCharacter.actionsPerformed++;
             }
+
         }
 
 
