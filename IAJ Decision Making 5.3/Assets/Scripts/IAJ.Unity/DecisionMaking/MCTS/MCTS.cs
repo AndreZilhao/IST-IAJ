@@ -1,3 +1,4 @@
+using Assets.Scripts.DecisionMakingActions;
 using Assets.Scripts.GameManager;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using System;
@@ -45,7 +46,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.NumberOfRuns = 10;
             this.MaxIterationsProcessedPerFrame = 100;
             this.MaxPlayoutDepthAllowed = 5;
-            this.MaxPlayoutSimulations = 5; // zero to disable
+            this.MaxPlayoutSimulations = 5; //stochastic simulations
             this.RandomGenerator = new System.Random();
         }
 
@@ -265,7 +266,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
 
         //method to average out and apply the effects of a sword attack playout in a stochastic world
-        private IWorldModel MergeStates(IWorldModel[] testStates, string enemy)
+        private IWorldModel MergeStates(IWorldModel[] testStates, SwordAttack enemy)
         {
             int hp = 0;
             int shieldHP = 0;
@@ -274,16 +275,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             int xp = 0;
             int n = testStates.Length;
 
-            //Tokenizing the enemy string
-            enemy = enemy.Remove(0, 11);
-            enemy = enemy.Replace("(", "");
-            enemy = enemy.Replace(")", "");
-
             for (int i = 0; i < n; i++)
             {
                 hp += (int)testStates[i].GetProperty(Properties.HP);
                 shieldHP += (int)testStates[i].GetProperty(Properties.SHIELDHP);
-                if ((bool)testStates[i].GetProperty(enemy) != true)
+                if ((bool)testStates[i].GetProperty(enemy.Target.tag) != true)
                 {
                     xp += (int)testStates[i].GetProperty(Properties.XP);
                     enemyDeadCount++;
@@ -307,7 +303,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             IWorldModel returnState = testStates[0];
             returnState.SetProperty(Properties.HP, hp);
             returnState.SetProperty(Properties.SHIELDHP, shieldHP);
-            returnState.SetProperty(enemy, enemyAlive);
+            returnState.SetProperty(enemy.Target.name, enemyAlive);
             returnState.SetProperty(Properties.XP, xp);
             return returnState;
         }
@@ -326,7 +322,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     testStates[i] = prevState.GenerateChildWorldModel();
                     action.ApplyActionEffects(testStates[i]);
                 }
-                prevState = MergeStates(testStates, action.Name);
+                prevState = MergeStates(testStates, (SwordAttack)action);
             }
             else
             {
