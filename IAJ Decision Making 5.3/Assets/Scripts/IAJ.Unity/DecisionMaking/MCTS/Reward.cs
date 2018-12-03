@@ -19,7 +19,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public float Value { get; set; }
         public int PlayerID { get; set; }
 
-        public Reward(WorldModel world, int player)
+        public Reward(IWorldModel world, int player)
         {
             this.PlayerID = player;
             this.hp = (int)world.GetProperty(Properties.HP);
@@ -28,11 +28,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.coinsCollected = (int)world.GetProperty(Properties.MONEY);
             this.time = (float)world.GetProperty(Properties.TIME);
 
-            for (int i = 0; i < 7; i++)
+            for (int i = 1; i <= 7; i++)
             {
                 if (!(bool)world.GetProperty("Skeleton" + i)) enemiesKilled++;
             }
-            for (int i = 0; i < 2; i++)
+            for (int i = 1; i <= 2; i++)
             {
                 if (!(bool)world.GetProperty("Orc" + i)) enemiesKilled++;
             }
@@ -44,15 +44,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.xp = (xp - 1) / 2;
             this.enemiesKilled = enemiesKilled / 10;
             this.coinsCollected = coinsCollected / 25;
-            this.time = 1 - (time/200);
-            {
-                Value = xp * 0.2f + hp * 0.4f + enemiesKilled * 0.3f + coinsCollected * 0.0f + time*0.3f;
-                //Value = time;
-            }
-            
+            this.time = 1 - (time / 200);
+
+            Value = xp * 0.2f + hp * 0.4f + enemiesKilled * 0.3f + coinsCollected * 0.0f + time * 0.3f;
+
         }
 
 
-        
+
     }
 }

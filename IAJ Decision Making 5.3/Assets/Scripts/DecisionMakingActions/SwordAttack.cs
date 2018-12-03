@@ -65,7 +65,7 @@ namespace Assets.Scripts.DecisionMakingActions
             this.Character.GameManager.SwordAttack(this.Target);
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(IWorldModel worldModel)
         {
             base.ApplyActionEffects(worldModel);
 
@@ -107,7 +107,7 @@ namespace Assets.Scripts.DecisionMakingActions
             }
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(IWorldModel worldModel)
         {
             float distance = Vector3.Distance(Character.transform.position, Target.transform.position);
             float distanceBonus = 10.0f - (float)((distance * 10.0f) / 530);

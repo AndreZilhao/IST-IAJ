@@ -22,7 +22,7 @@ namespace Assets.Scripts.DecisionMakingActions
             return this.GetDuration(this.Character.Character.KinematicData.position);
         }
 
-        public override float GetDuration(WorldModel worldModel)
+        public override float GetDuration(IWorldModel worldModel)
         {
             var position = (Vector3)worldModel.GetProperty(Properties.POSITION);
             return this.GetDuration(position);
@@ -48,7 +48,7 @@ namespace Assets.Scripts.DecisionMakingActions
             return this.Target != null;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(IWorldModel worldModel)
         {
             if (this.Target == null) return false;
             var targetEnabled = (bool)worldModel.GetProperty(this.Target.name);
@@ -61,7 +61,7 @@ namespace Assets.Scripts.DecisionMakingActions
         }
 
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(IWorldModel worldModel)
         {
             var duration = this.GetDuration(worldModel);
 

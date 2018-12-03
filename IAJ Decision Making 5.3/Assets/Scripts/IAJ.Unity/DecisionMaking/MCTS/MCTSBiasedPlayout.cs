@@ -12,36 +12,36 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
         }
 
-        protected override Reward Playout(WorldModel initialPlayoutState)
+        protected override Reward Playout(IWorldModel initialPlayoutState)
         {
-            WorldModel state = initialPlayoutState.GenerateChildWorldModel();
+            IWorldModel state = initialPlayoutState.GenerateChildWorldModel();
             CurrentDepth = 0;
             while (!state.IsTerminal() && CurrentDepth < MaxPlayoutDepthAllowed)
             {
-                List<KeyValuePair<int,GOB.Action>> actions = new List<KeyValuePair<int, GOB.Action>>();
+                List<KeyValuePair<int, GOB.Action>> actions = new List<KeyValuePair<int, GOB.Action>>();
                 foreach (GOB.Action action in state.GetExecutableActions())
                 {
-                    actions.Add(new KeyValuePair<int,GOB.Action>((int)action.GetHValue(state), action));
+                    actions.Add(new KeyValuePair<int, GOB.Action>((int)action.GetHValue(state), action));
                 }
-
                 actions.Sort(
                     delegate (KeyValuePair<int, GOB.Action> p1, KeyValuePair<int, GOB.Action> p2)
                     {
                         return p1.Key.CompareTo(p2.Key);
                     }
                 );
+                if (actions.Count == 0) break;
 
                 int randomValue = this.RandomGenerator.Next((int)actions[actions.Count - 1].Key);
-               // Debug.Log("random :");  // debug
-               // Debug.Log(randomValue); // debug
+                // Debug.Log("random :");  // debug
+                // Debug.Log(randomValue); // debug
 
                 foreach (KeyValuePair<int, GOB.Action> pair in actions)
                 {
-                  //  Debug.Log("\n"); // debug
-                   // Debug.Log("pair<int,action> :"); // debug
-                   // Debug.Log(pair.Key); // debug
-                   // Debug.Log(" , "); // debug
-                   // Debug.Log(pair.Value.Name); // debug
+                    //  Debug.Log("\n"); // debug
+                    // Debug.Log("pair<int,action> :"); // debug
+                    // Debug.Log(pair.Key); // debug
+                    // Debug.Log(" , "); // debug
+                    // Debug.Log(pair.Value.Name); // debug
 
                     if (pair.Key > randomValue)
                     {

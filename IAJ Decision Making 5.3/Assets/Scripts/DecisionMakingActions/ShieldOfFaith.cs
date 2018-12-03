@@ -31,15 +31,16 @@ namespace Assets.Scripts.DecisionMakingActions
         public override bool CanExecute()
         {
             if (!base.CanExecute()) return false;
-            return (this.Character.GameManager.characterData.Mana >= 5);
+            return (this.Character.GameManager.characterData.Mana >= 5 && this.Character.GameManager.characterData.ShieldHP < 5);
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(IWorldModel worldModel)
         {
             if (!base.CanExecute(worldModel)) return false;
 
             var mana = (int)worldModel.GetProperty(Properties.MANA);
-            return (mana >= 5);
+            var shield = (int)worldModel.GetProperty(Properties.SHIELDHP);
+            return (mana >= 5 && shield < 5);
         }
 
         public override void Execute()
@@ -48,7 +49,7 @@ namespace Assets.Scripts.DecisionMakingActions
             this.Character.GameManager.ShieldOfFaith();
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(IWorldModel worldModel)
         {
             base.ApplyActionEffects(worldModel);
 
@@ -61,7 +62,7 @@ namespace Assets.Scripts.DecisionMakingActions
             worldModel.SetProperty(Properties.MANA, mana - 5);
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(IWorldModel worldModel)
         {
             return 0;
             int hp = (int)worldModel.GetProperty(Properties.HP);

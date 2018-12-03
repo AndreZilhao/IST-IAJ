@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
-    public class WorldModel
+    public class WorldModel : IWorldModel
     {
         private Dictionary<string, object> Properties { get; set; }
-        private List<Action> Actions { get; set; }
+        protected List<Action> Actions { get; set; }
         protected IEnumerator<Action> ActionEnumerator { get; set; } 
 
         private Dictionary<string, float> GoalValues { get; set; } 
@@ -97,7 +97,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             this.GoalValues[goalName] = limitedValue;
         }
 
-        public virtual WorldModel GenerateChildWorldModel()
+        public virtual IWorldModel GenerateChildWorldModel()
         {
             return new WorldModel(this);
         }

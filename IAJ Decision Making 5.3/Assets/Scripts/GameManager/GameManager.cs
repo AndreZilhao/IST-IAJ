@@ -243,7 +243,7 @@ namespace Assets.Scripts.GameManager
                     enemy.SetActive(false);
                     Object.Destroy(enemy);
                 }
-
+                this.characterData.Mana = 0;
                 enemies.Clear();
                 this.WorldChanged = true;
                 this.autonomousCharacter.actionsPerformed++;

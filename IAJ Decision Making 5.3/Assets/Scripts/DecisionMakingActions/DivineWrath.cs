@@ -24,7 +24,7 @@ namespace Assets.Scripts.DecisionMakingActions {
             return (this.Character.GameManager.characterData.Mana >= 10 && this.Character.GameManager.characterData.Level >= 3);
         }
 
-        public override bool CanExecute(WorldModel worldModel) {
+        public override bool CanExecute(IWorldModel worldModel) {
             if (!base.CanExecute(worldModel))
                 return false;
 
@@ -38,7 +38,7 @@ namespace Assets.Scripts.DecisionMakingActions {
             this.Character.GameManager.DivineWrath();
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel) {
+        public override void ApplyActionEffects(IWorldModel worldModel) {
             base.ApplyActionEffects(worldModel);
 
             var goalValue = worldModel.GetGoalValue(AutonomousCharacter.GET_RICH_GOAL);
@@ -46,9 +46,20 @@ namespace Assets.Scripts.DecisionMakingActions {
 
             var mana = (int)worldModel.GetProperty(Properties.MANA);
             worldModel.SetProperty(Properties.MANA, mana - 10);
+
+            for (int i = 0; i < 7; i++)
+            {
+                worldModel.SetProperty("Skeleton" + i, false);
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                worldModel.SetProperty("Orc" + i, false);
+            }
+            worldModel.SetProperty("Dragon", false);
+            
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(IWorldModel worldModel)
         {
             //this is OP
             return 200.0f;

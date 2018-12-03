@@ -25,7 +25,7 @@ namespace Assets.Scripts.DecisionMakingActions
             return true;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(IWorldModel worldModel)
         {
             if (!base.CanExecute(worldModel)) return false;
             return true;
@@ -37,7 +37,7 @@ namespace Assets.Scripts.DecisionMakingActions
             this.Character.GameManager.PickUpChest(this.Target);
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(IWorldModel worldModel)
         {
             base.ApplyActionEffects(worldModel);
 
@@ -51,7 +51,7 @@ namespace Assets.Scripts.DecisionMakingActions
             worldModel.SetProperty(this.Target.name, false);
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(IWorldModel worldModel)
         {
             float distance = Vector3.Distance(Character.transform.position, Target.transform.position);
             if (distance < 20.0f)

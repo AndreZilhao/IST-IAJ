@@ -13,7 +13,7 @@ namespace Assets.Scripts.DecisionMakingActions
             this.Character = character;
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(IWorldModel worldModel)
         {
             int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
             int level = (int)worldModel.GetProperty(Properties.LEVEL);
@@ -32,7 +32,7 @@ namespace Assets.Scripts.DecisionMakingActions
         }
         
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(IWorldModel worldModel)
         {
             int xp = (int)worldModel.GetProperty(Properties.XP);
             int level = (int)worldModel.GetProperty(Properties.LEVEL);
@@ -50,7 +50,7 @@ namespace Assets.Scripts.DecisionMakingActions
             return 0.0f;
         }
 
-        public override float GetDuration(WorldModel worldModel)
+        public override float GetDuration(IWorldModel worldModel)
         {
             return 0.0f;
         }
@@ -60,7 +60,7 @@ namespace Assets.Scripts.DecisionMakingActions
             return 0.0f;
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(IWorldModel worldModel)
         {
             //you would be dumb not to level up if possible
             return 200.0f;

@@ -32,7 +32,7 @@ namespace Assets.Scripts.DecisionMakingActions
             return this.Character.GameManager.characterData.HP < this.Character.GameManager.characterData.MaxHP;
         }
 
-		public override bool CanExecute(WorldModel worldModel)
+		public override bool CanExecute(IWorldModel worldModel)
 		{
             if (!base.CanExecute(worldModel)) return false;
 
@@ -47,7 +47,7 @@ namespace Assets.Scripts.DecisionMakingActions
             this.Character.GameManager.GetHealthPotion(this.Target);
         }
 
-		public override void ApplyActionEffects(WorldModel worldModel)
+		public override void ApplyActionEffects(IWorldModel worldModel)
 		{
             base.ApplyActionEffects(worldModel);
 
@@ -62,7 +62,7 @@ namespace Assets.Scripts.DecisionMakingActions
             worldModel.SetProperty(this.Target.name, false);
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(IWorldModel worldModel)
         {
             float distance = Vector3.Distance(Character.transform.position, Target.transform.position);
             float distanceBonus = 10.0f - (float)((distance * 10.0f) / 530);

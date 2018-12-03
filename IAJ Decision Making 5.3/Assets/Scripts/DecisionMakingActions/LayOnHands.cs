@@ -30,7 +30,7 @@ namespace Assets.Scripts.DecisionMakingActions {
             return (this.Character.GameManager.characterData.Mana >= 7 && this.Character.GameManager.characterData.Level >= 2);
         }
 
-        public override bool CanExecute(WorldModel worldModel) {
+        public override bool CanExecute(IWorldModel worldModel) {
             if (!base.CanExecute(worldModel))
                 return false;
 
@@ -44,7 +44,7 @@ namespace Assets.Scripts.DecisionMakingActions {
             this.Character.GameManager.LayOnHands();
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel) {
+        public override void ApplyActionEffects(IWorldModel worldModel) {
             base.ApplyActionEffects(worldModel);
 
             var surviveValue = worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL);
@@ -57,7 +57,7 @@ namespace Assets.Scripts.DecisionMakingActions {
             worldModel.SetProperty(Properties.MANA, mana - 7);
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(IWorldModel worldModel)
         {
             int hp = (int)worldModel.GetProperty(Properties.HP);
             int maxhp = (int)worldModel.GetProperty(Properties.MAXHP);

@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.GameManager;
+using Assets.Scripts.GameManager;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using System;
 using System.Collections.Generic;
@@ -42,10 +42,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
             this.MaxIterations = 2000;
-            this.NumberOfRuns = 8;
+            this.NumberOfRuns = 10;
             this.MaxIterationsProcessedPerFrame = 100;
             this.MaxPlayoutDepthAllowed = 5;
-            this.MaxPlayoutSimulations = 0; // zero to disable
+            this.MaxPlayoutSimulations = 5; // zero to disable
             this.RandomGenerator = new System.Random();
         }
 
@@ -121,7 +121,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             MCTSNode currentNode = initialNode;
 
             while (!currentNode.State.IsTerminal())
-            { 
+            {
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null)
                 {
@@ -136,9 +136,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return currentNode;
         }
 
-        virtual protected Reward Playout(WorldModel initialPlayoutState)
+        virtual protected Reward Playout(IWorldModel initialPlayoutState)
         {
-            WorldModel prevState = initialPlayoutState.GenerateChildWorldModel();
+            IWorldModel prevState = initialPlayoutState.GenerateChildWorldModel();
             CurrentDepth = 0;
             //Perform n playouts for each state [to deal with stochastic nature]
             while (!prevState.IsTerminal() && CurrentDepth < MaxPlayoutDepthAllowed)
@@ -182,7 +182,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private MCTSNode BestUCTChild(MCTSNode node)
         {
             MCTSNode bestChild = null;
-            float bestUtility = 0;
+            float bestUtility = -1000;
             foreach (MCTSNode childNode in node.ChildNodes)
             {
                 float utility = (childNode.Q / childNode.N) + C * Mathf.Sqrt(Mathf.Log(node.N) / childNode.N);
@@ -219,14 +219,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             //Consider no-brainer actions as always the best child. (pick-up nearby chest/level-up)
             foreach (MCTSNode n in nodes[0].ChildNodes)
             {
-                if (n.Action.Name == "LevelUp")
+                if (n.Action.Name == "LevelUp" && ((int)n.State.GetProperty(Properties.LEVEL) <= 2))
                 {
                     Debug.Log("I'm levelin' cause it's cool");
                     return n;
                 }
                 if (n.Action.GetType().Equals(typeof(PickUpChest)))
                 {
-                    
+
                     if (n.Action.GetDuration(nodes[0].State) < 0.8f)
                     {
                         Debug.Log("I'm chestin' cause it's cool");
@@ -250,7 +250,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     dict[b.Action.Name] = b.N;
                 }
             }
-              var max  = dict.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            var max = dict.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
 
             //find the selected best action in the first tree and return it
             foreach (MCTSNode n in nodes[0].ChildNodes)
@@ -265,7 +265,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
 
         //method to average out and apply the effects of a sword attack playout in a stochastic world
-        private WorldModel MergeStates(WorldModel[] testStates, string enemy)
+        private IWorldModel MergeStates(IWorldModel[] testStates, string enemy)
         {
             int hp = 0;
             int shieldHP = 0;
@@ -283,8 +283,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 hp += (int)testStates[i].GetProperty(Properties.HP);
                 shieldHP += (int)testStates[i].GetProperty(Properties.SHIELDHP);
-                xp += (int)testStates[i].GetProperty(Properties.XP);
-                if ((bool)testStates[i].GetProperty(enemy) != true) enemyDeadCount++;
+                if ((bool)testStates[i].GetProperty(enemy) != true)
+                {
+                    xp += (int)testStates[i].GetProperty(Properties.XP);
+                    enemyDeadCount++;
+                }
             }
 
             hp = hp / n;
@@ -301,7 +304,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             }
 
             //returning the testState[0] as the resulting average
-            WorldModel returnState = testStates[0];
+            IWorldModel returnState = testStates[0];
             returnState.SetProperty(Properties.HP, hp);
             returnState.SetProperty(Properties.SHIELDHP, shieldHP);
             returnState.SetProperty(enemy, enemyAlive);
@@ -311,11 +314,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         //Simulates one or many playouts of an action in a state. Only applies to swordattack as all other actions are not stochastic.
         //Afterwards merges them in MergeStates to average out the results.
-        protected WorldModel StochasticPlayout(Action action, WorldModel prevState, int n)
+        protected IWorldModel StochasticPlayout(Action action, IWorldModel prevState, int n)
         {
             if (action.Name.Contains("SwordAttack") && n > 0)
             {
-                WorldModel[] testStates = new WorldModel[n];
+                //IWorldModel[] testStates = new WorldModelFEAR[n];
+                IWorldModel[] testStates = new WorldModel[n];
                 for (int i = 0; i < n; i++)
                 {
                     TotalPlayouts++;
