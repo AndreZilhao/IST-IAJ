@@ -64,11 +64,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
         public override float GetHValue(IWorldModel worldModel)
         {
-            return 0;
-            int hp = (int)worldModel.GetProperty(Properties.HP);
-            int maxhp = (int)worldModel.GetProperty(Properties.MAXHP);
-            // 0 a 80
-            return 80.0f - (float)((hp * 80) / maxhp);
+            return 0.0f;
         }
     }
 }

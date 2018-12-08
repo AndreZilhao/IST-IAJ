@@ -25,8 +25,8 @@ namespace Assets.Scripts.GameManager
 
         public override IWorldModel GenerateChildWorldModel()
         {
-            //return new WorldModelFEAR(Actions, GameManager);
-            return new FutureStateWorldModel(this);
+            return new WorldModelFEAR(Actions, GameManager);
+            //return new FutureStateWorldModel(this);
         }
 
         public override bool IsTerminal()

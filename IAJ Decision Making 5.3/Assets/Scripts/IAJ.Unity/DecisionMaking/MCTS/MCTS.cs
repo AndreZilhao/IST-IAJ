@@ -50,7 +50,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.RandomGenerator = new System.Random();
         }
 
-
         public void InitializeMCTSearch()
         {
             this.MaxPlayoutDepthReached = 0;
@@ -75,6 +74,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         public GOB.Action Run()
         {
+            //Default actions that should always be taken
+            Action a = CheckAlwaysBestAction(InitialNodes[0]);
+            if (a != null) return a;
+
             MCTSNode selectedNode;
             Reward reward;
             var startTime = Time.realtimeSinceStartup;
@@ -87,7 +90,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     TotalProcessingTime += Time.realtimeSinceStartup - startTime;
                     return null;
                 }
-
                 selectedNode = Selection(InitialNodes[currentMCTS]);
                 if (selectedNode == InitialNodes[currentMCTS])
                     break;
@@ -112,6 +114,31 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 TotalProcessingTime += Time.realtimeSinceStartup - startTime;
                 return BestFirstChild.Action;
+            }
+            return null;
+        }
+
+        //Will return an action that is obviously a good choice and doesn't need MCTS processing to execute.
+        private GOB.Action CheckAlwaysBestAction(MCTSNode mCTSNode)
+        {
+            //Consider no-brainer actions as always the best child. (pick-up nearby chest/level-up)
+            foreach (MCTSNode n in mCTSNode.ChildNodes)
+            {
+                if (n.Action.Name == "LevelUp")
+                {
+                    return n.Action;
+                }
+                if (n.Action.Name == "DivineWrath")
+                {
+                    return n.Action;
+                }
+                if (n.Action.GetType().Equals(typeof(PickUpChest)))
+                {
+                    if (n.Action.GetDuration(InitialNodes[0].State) < 0.8f)
+                    {
+                        return n.Action;
+                    }
+                }
             }
             return null;
         }
@@ -179,7 +206,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         }
 
         //gets the best child of a node, using the UCT formula
-        // usado na exploração
+        //usado na exploração
         private MCTSNode BestUCTChild(MCTSNode node)
         {
             MCTSNode bestChild = null;
@@ -197,7 +224,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         }
 
         //this method is very similar to the bestUCTChild, but it is used to return the final action of the MCTS search, and so we do not care about
-        //the exploration factor //RETORNAR NO FINAL, SEM TER EM CONTA A EXPLORAÇÃO (podemos obter isto através do numero de explorações feitas (BEST CHOICE), ou melhor Q/N)
+        //the exploration factor
         private MCTSNode BestChild(MCTSNode node)
         {
             MCTSNode bestChild = null;
@@ -217,31 +244,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private MCTSNode BestChildFromSeveral(MCTSNode[] nodes)
         {
             if (nodes[0].ChildNodes.Count == 0) return null;
-            //Consider no-brainer actions as always the best child. (pick-up nearby chest/level-up)
-            foreach (MCTSNode n in nodes[0].ChildNodes)
-            {
-                if (n.Action.Name == "LevelUp" && ((int)n.State.GetProperty(Properties.LEVEL) <= 2))
-                {
-                    Debug.Log("I'm levelin' cause it's cool");
-                    return n;
-                }
-                if (n.Action.GetType().Equals(typeof(PickUpChest)))
-                {
-
-                    if (n.Action.GetDuration(nodes[0].State) < 0.8f)
-                    {
-                        Debug.Log("I'm chestin' cause it's cool");
-                        return n;
-                    }
-                }
-            }
             //find the overall best action and store it in 'max'
             Dictionary<string, int> dict = new Dictionary<string, int>();
             foreach (MCTSNode n in nodes)
             {
                 MCTSNode b = BestChild(n);
-                //Debug.Log(b.Action.Name);
-                //Debug.Log("n:" + b.N + "q:" + b.Q);
                 if (dict.ContainsKey(b.Action.Name))
                 {
                     dict[b.Action.Name] += b.N;
@@ -308,14 +315,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return returnState;
         }
 
+
+
         //Simulates one or many playouts of an action in a state. Only applies to swordattack as all other actions are not stochastic.
         //Afterwards merges them in MergeStates to average out the results.
         protected IWorldModel StochasticPlayout(Action action, IWorldModel prevState, int n)
         {
             if (action.Name.Contains("SwordAttack") && n > 0)
             {
-                //IWorldModel[] testStates = new WorldModelFEAR[n];
-                IWorldModel[] testStates = new WorldModel[n];
+                IWorldModel[] testStates = new WorldModelFEAR[n];
+                //IWorldModel[] testStates = new WorldModel[n];
                 for (int i = 0; i < n; i++)
                 {
                     TotalPlayouts++;

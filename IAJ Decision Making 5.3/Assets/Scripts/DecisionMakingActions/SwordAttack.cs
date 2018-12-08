@@ -119,7 +119,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
             else if (level == 2)
             {
-                if (Target.tag.Equals("Skeleton"))
+                if (Target.tag.Equals("Skeleton") && (int)worldModel.GetProperty(Properties.MANA) < 2)
                 {
                     return 50.0f + distanceBonus;
                 }
@@ -134,7 +134,7 @@ namespace Assets.Scripts.DecisionMakingActions
             }
             else
             {
-                if (Target.tag.Equals("Skeleton"))
+                if (Target.tag.Equals("Skeleton") && (int)worldModel.GetProperty(Properties.MANA) < 2)
                 {
                     return 30.0f + distanceBonus;
                 }

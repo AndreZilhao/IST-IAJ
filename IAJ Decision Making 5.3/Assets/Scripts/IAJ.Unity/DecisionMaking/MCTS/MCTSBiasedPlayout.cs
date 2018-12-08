@@ -32,20 +32,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 if (actions.Count == 0) break;
 
                 int randomValue = this.RandomGenerator.Next((int)actions[actions.Count - 1].Key);
-                // Debug.Log("random :");  // debug
-                // Debug.Log(randomValue); // debug
 
                 foreach (KeyValuePair<int, GOB.Action> pair in actions)
                 {
-                    //  Debug.Log("\n"); // debug
-                    // Debug.Log("pair<int,action> :"); // debug
-                    // Debug.Log(pair.Key); // debug
-                    // Debug.Log(" , "); // debug
-                    // Debug.Log(pair.Value.Name); // debug
-
                     if (pair.Key > randomValue)
                     {
-                        //Debug.Log("Action selected: "+ pair.Value.Name + "Random: " + randomValue + "pair.key: " + pair.Key);
                         state = StochasticPlayout(pair.Value, state, MaxPlayoutSimulations);
                         pair.Value.ApplyActionEffects(state);
                         break;

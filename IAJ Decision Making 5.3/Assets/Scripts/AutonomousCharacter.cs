@@ -219,18 +219,6 @@ namespace Assets.Scripts
 
             if (MCTSActive)
             {
-                //if chest in vicinity, then just get chest instead before considering other actions (we are considering chests + nearby enemy as atomic)
-                /*
-                List<GameObject> chests = GameObject.FindGameObjectsWithTag("Chest").ToList();
-                foreach(var chest in chests)
-                {
-                    float distance = Vector3.Distance(Character.KinematicData.position, chest.transform.position);
-                    if (distance < 15.0f)
-                    {
-                        this.CurrentAction = new PickUpChest(this, chest);
-                    }
-                }
-                */
                 if(this.CurrentAction == null)
                     this.UpdateMCTS();
             }
