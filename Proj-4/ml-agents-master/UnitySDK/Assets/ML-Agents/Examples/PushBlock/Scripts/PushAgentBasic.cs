@@ -10,7 +10,9 @@ public class PushAgentBasic : Agent
     /// <summary>
     /// The ground. The bounds are used to spawn the elements.
     /// </summary>
-	public GameObject ground;
+    /// 
+    public GameObject[] walls;
+    public GameObject ground;
 
     public GameObject area;
 
@@ -21,6 +23,8 @@ public class PushAgentBasic : Agent
     public Bounds areaBounds;
 
     PushBlockAcademy academy;
+
+    
 
     /// <summary>
     /// The goal to push the block to.
@@ -200,6 +204,26 @@ public class PushAgentBasic : Agent
         blockRB.angularVelocity = Vector3.zero;
     }
 
+    void SelectRandomWall()
+    {
+        int selectedWall = Random.Range(0, 4);
+        for(int i = 0; i < walls.Length; i++)
+        {
+            walls[i].GetComponentInChildren<Transform>(true).gameObject.SetActive(false);
+        }
+        walls[selectedWall].GetComponentInChildren<Transform>(true).gameObject.SetActive(true);
+    }
+
+    public static Transform[] GetTopLevelChildren(Transform Parent)
+    {
+        Transform[] Children = new Transform[Parent.childCount];
+        for (int ID = 0; ID < Parent.childCount; ID++)
+        {
+            Children[ID] = Parent.GetChild(ID);
+        }
+        return Children;
+    }
+
 
     /// <summary>
     /// In the editor, if "Reset On Done" is checked then AgentReset() will be 
@@ -210,7 +234,7 @@ public class PushAgentBasic : Agent
         int rotation = Random.Range(0, 4);
         float rotationAngle = rotation * 90f;
         area.transform.Rotate(new Vector3(0f, rotationAngle, 0f));
-
+        SelectRandomWall();
         ResetBlock();
         transform.position = GetRandomSpawnPos();
         agentRB.velocity = Vector3.zero;
