@@ -43,6 +43,7 @@ public class PushAgentBasic : Agent
     public GoalDetect goalDetect;
 
     public bool useVectorObs;
+    private int difficulty = 3;
 
     Rigidbody blockRB;  //cached on initialization
     Rigidbody agentRB;  //cached on initialization
@@ -65,6 +66,7 @@ public class PushAgentBasic : Agent
         goalDetect = block.GetComponent<GoalDetect>();
         goalDetect.agent = this;
         rayPer = GetComponent<RayPerception>();
+
 
         // Cache the agent rigidbody
         agentRB = GetComponent<Rigidbody>();
@@ -206,12 +208,18 @@ public class PushAgentBasic : Agent
 
     void SelectRandomWall()
     {
-        int selectedWall = Random.Range(0, 4);
-        for(int i = 0; i < walls.Length; i++)
+        //Get wall selection for given difficulty
+        Transform[] children = GetTopLevelChildren(walls[difficulty].transform);
+        int selectedWall = Random.Range(0, children.Length);
+
+        //Deactivate all walls
+        for(int i = 0; i < children.Length; i++)
         {
-            walls[i].GetComponentInChildren<Transform>(true).gameObject.SetActive(false);
+            children[i].GetComponentInChildren<Transform>(true).gameObject.SetActive(false);
         }
-        walls[selectedWall].GetComponentInChildren<Transform>(true).gameObject.SetActive(true);
+
+        //Activate the randomly selected wall
+        children[selectedWall].GetComponentInChildren<Transform>(true).gameObject.SetActive(true);
     }
 
     public static Transform[] GetTopLevelChildren(Transform Parent)
