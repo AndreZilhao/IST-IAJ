@@ -35,7 +35,7 @@ BouncerLearning:
     hidden_units: 64
 
 PushBlockLearning:
-    max_steps: 1.0e6
+    max_steps: 5.0e5
     batch_size: 128
     buffer_size: 2048
     beta: 1.0e-2
