@@ -15,6 +15,11 @@ public class PushBlockAcademy : Academy
     /// </summary>
 	public float agentRunSpeed;
 
+    //Curriculum stats
+    [HideInInspector]
+    public int episodeCount = 0;
+    public int difficulty = 0;
+
     /// <summary>
     /// The agent rotation speed.
     /// Every agent will use this setting.
@@ -50,5 +55,17 @@ public class PushBlockAcademy : Academy
     {
         Physics.gravity *= gravityMultiplier;
 
+    }
+
+    public override void AcademyStep()
+    {
+        base.AcademyStep();
+        this.episodeCount++;
+    }
+
+    public override void AcademyReset()
+    {
+        base.AcademyReset();
+        difficulty = (int)resetParameters["Difficulty"];
     }
 }

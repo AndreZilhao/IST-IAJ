@@ -43,7 +43,8 @@ public class PushAgentBasic : Agent
     public GoalDetect goalDetect;
 
     public bool useVectorObs;
-    private int difficulty = 3;
+    private int currentEpisode;
+    private int localDifficulty;
 
     Rigidbody blockRB;  //cached on initialization
     Rigidbody agentRB;  //cached on initialization
@@ -66,6 +67,8 @@ public class PushAgentBasic : Agent
         goalDetect = block.GetComponent<GoalDetect>();
         goalDetect.agent = this;
         rayPer = GetComponent<RayPerception>();
+        currentEpisode = 0;
+        localDifficulty = academy.difficulty;
 
 
         // Cache the agent rigidbody
@@ -206,20 +209,32 @@ public class PushAgentBasic : Agent
         blockRB.angularVelocity = Vector3.zero;
     }
 
-    void SelectRandomWall()
+    void SelectRandomWall(int difficulty)
     {
         //Get wall selection for given difficulty
         Transform[] children = GetTopLevelChildren(walls[difficulty].transform);
-        int selectedWall = Random.Range(0, children.Length);
 
-        //Deactivate all walls
-        for(int i = 0; i < children.Length; i++)
+        int selectedWall = Random.Range(0, children.Length);
+        DeactivateWalls(children);
+        //Activate the randomly selected wall
+        children[selectedWall].GetComponentInChildren<Transform>(true).gameObject.SetActive(true);
+    }
+
+    void DeactivateWalls(int difficulty)
+    {
+        Transform[] children = GetTopLevelChildren(walls[difficulty].transform);
+        for (int i = 0; i < children.Length; i++)
         {
             children[i].GetComponentInChildren<Transform>(true).gameObject.SetActive(false);
         }
+    }
 
-        //Activate the randomly selected wall
-        children[selectedWall].GetComponentInChildren<Transform>(true).gameObject.SetActive(true);
+    void DeactivateWalls(Transform[] children)
+    {
+        for (int i = 0; i < children.Length; i++)
+        {
+            children[i].GetComponentInChildren<Transform>(true).gameObject.SetActive(false);
+        }
     }
 
     public static Transform[] GetTopLevelChildren(Transform Parent)
@@ -239,10 +254,15 @@ public class PushAgentBasic : Agent
     /// </summary>
 	public override void AgentReset()
     {
+        if(localDifficulty < academy.difficulty)
+        {
+            DeactivateWalls(localDifficulty);
+            localDifficulty = academy.difficulty;
+        }
         int rotation = Random.Range(0, 4);
         float rotationAngle = rotation * 90f;
         area.transform.Rotate(new Vector3(0f, rotationAngle, 0f));
-        SelectRandomWall();
+        SelectRandomWall(academy.difficulty);
         ResetBlock();
         transform.position = GetRandomSpawnPos();
         agentRB.velocity = Vector3.zero;
