@@ -1672,7 +1672,9 @@ MonoBehaviour:
     timeScale: 1
     targetFrameRate: 60
   resetParameters:
-    resetParameters: []
+    resetParameters:
+    - key: Difficulty
+      value: 0
   agentRunSpeed: 2
   episodeCount: 0
   difficulty: 0
