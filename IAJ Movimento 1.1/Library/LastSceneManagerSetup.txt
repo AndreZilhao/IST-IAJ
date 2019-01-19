@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/Scenes/DynamicMovement.unity
-  isLoaded: 1
-  isActive: 1
