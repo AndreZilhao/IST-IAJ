@@ -9,6 +9,13 @@ using MLAgents;
 
 public class PushBlockAcademy : Academy
 {
+    [HideInInspector]
+    public GameObject[][] wallDifficulties;
+
+    public GameObject[] wallsEasy;
+    public GameObject[] wallsMedium;
+    public GameObject[] wallsHard;
+    public GameObject[] wallsVeryHard;
 
     /// <summary>
     /// The "walking speed" of the agents in the scene. 
@@ -17,8 +24,8 @@ public class PushBlockAcademy : Academy
 
     //Curriculum stats
     [HideInInspector]
-    public int episodeCount = 0;
-    public int difficulty = 0;
+
+    public int difficulty = 3;
 
     /// <summary>
     /// The agent rotation speed.
@@ -57,15 +64,19 @@ public class PushBlockAcademy : Academy
 
     }
 
-    public override void AcademyStep()
-    {
-        base.AcademyStep();
-        this.episodeCount++;
-    }
-
     public override void AcademyReset()
     {
         base.AcademyReset();
         difficulty = (int)resetParameters["Difficulty"];
+    }
+
+    public override void InitializeAcademy()
+    {
+        base.InitializeAcademy();
+        wallDifficulties = new GameObject[4][];
+        wallDifficulties[0] = wallsEasy;
+        wallDifficulties[1] = wallsMedium;
+        wallDifficulties[2] = wallsHard;
+        wallDifficulties[3] = wallsVeryHard;
     }
 }

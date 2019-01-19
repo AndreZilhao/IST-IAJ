@@ -22,6 +22,8 @@ public class PushAgentBasic : Agent
 	[HideInInspector]
     public Bounds areaBounds;
 
+
+    public LayerMask layer;
     PushBlockAcademy academy;
 
     
@@ -43,8 +45,8 @@ public class PushAgentBasic : Agent
     public GoalDetect goalDetect;
 
     public bool useVectorObs;
-    private int currentEpisode;
     private int localDifficulty;
+    private GameObject map;
 
     Rigidbody blockRB;  //cached on initialization
     Rigidbody agentRB;  //cached on initialization
@@ -67,9 +69,7 @@ public class PushAgentBasic : Agent
         goalDetect = block.GetComponent<GoalDetect>();
         goalDetect.agent = this;
         rayPer = GetComponent<RayPerception>();
-        currentEpisode = 0;
         localDifficulty = academy.difficulty;
-
 
         // Cache the agent rigidbody
         agentRB = GetComponent<Rigidbody>();
@@ -110,7 +110,7 @@ public class PushAgentBasic : Agent
             float randomPosZ = Random.Range(-areaBounds.extents.z * academy.spawnAreaMarginMultiplier,
                                             areaBounds.extents.z * academy.spawnAreaMarginMultiplier);
             randomSpawnPos = ground.transform.position + new Vector3(randomPosX, 1f, randomPosZ);
-            if (Physics.CheckBox(randomSpawnPos, new Vector3(2.5f, 0.01f, 2.5f)) == false)
+            if (Physics.CheckBox(randomSpawnPos, new Vector3(2.5f, 0.01f, 2.5f), Quaternion.identity, layer) == false)
             {
                 foundNewSpawnLocation = true;
             }
@@ -256,13 +256,17 @@ public class PushAgentBasic : Agent
     {
         if(localDifficulty < academy.difficulty)
         {
-            DeactivateWalls(localDifficulty);
             localDifficulty = academy.difficulty;
         }
+        //Selects a random map from available difficulties
+        int selectedDifficulty = Random.Range(0, localDifficulty);
+        GameObject[] samples = academy.wallDifficulties[selectedDifficulty];
+        //Instantiates a new map
+        Destroy(map);
+        map = Instantiate(samples[Random.Range(0, samples.Length)], area.transform);
         int rotation = Random.Range(0, 4);
         float rotationAngle = rotation * 90f;
         area.transform.Rotate(new Vector3(0f, rotationAngle, 0f));
-        SelectRandomWall(academy.difficulty);
         ResetBlock();
         transform.position = GetRandomSpawnPos();
         agentRB.velocity = Vector3.zero;
