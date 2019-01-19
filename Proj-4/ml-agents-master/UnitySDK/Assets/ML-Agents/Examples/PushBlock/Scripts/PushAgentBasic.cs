@@ -24,6 +24,7 @@ public class PushAgentBasic : Agent
 
 
     public LayerMask layer;
+    public LayerMask rewardCubes;
     PushBlockAcademy academy;
 
     
@@ -70,6 +71,7 @@ public class PushAgentBasic : Agent
         goalDetect.agent = this;
         rayPer = GetComponent<RayPerception>();
         localDifficulty = academy.difficulty;
+        
 
         // Cache the agent rigidbody
         agentRB = GetComponent<Rigidbody>();
@@ -92,7 +94,37 @@ public class PushAgentBasic : Agent
             var detectableObjects = new[] { "block", "goal", "wall" };
             AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 0f, 0f));
             AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 1.5f, 0f));
+            float[] f = CollectRewardObs();
+            //Debug.Log("-90:" + f[0] + "  -45:" + f[1] + "  00:" + f[2] + "  +45:" + f[3] + "  +90:" + f[4] );
+            // Aditional reward-cube observations.
+            AddVectorObs(f);
         }
+        
+    }
+
+    public float[] CollectRewardObs()
+    {
+        Vector3 rayHeight = transform.position + new Vector3(0, -0.5f, 0);
+        RaycastHit hit;
+        int rotation = -90;
+        Quaternion rot = Quaternion.AngleAxis(rotation, Vector3.up);
+        float[] ret = { 0, 0, 0, 0, 0 };
+
+        //5 rays [-0, -45, 0, 45, 90]
+        for (int i = 0; i < 5; i++)
+        {
+            if (Physics.Raycast(rayHeight, transform.TransformDirection(rot * Vector3.forward), out hit, 3f, rewardCubes))
+            {
+                NodeComponent n = hit.collider.GetComponent<NodeComponent>();
+                if (n != null)
+                {
+                    ret[i] = n.value;
+                }
+            }
+            rotation += 45;
+            rot = Quaternion.AngleAxis(rotation, Vector3.up);
+        }
+        return ret;
     }
 
     /// <summary>

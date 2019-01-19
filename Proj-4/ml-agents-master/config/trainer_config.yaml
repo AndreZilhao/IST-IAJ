@@ -44,6 +44,16 @@ PushBlockLearning:
     time_horizon: 64
     num_layers: 2
 
+PushBlockLearningReward:
+    max_steps: 5.0e5
+    batch_size: 128
+    buffer_size: 2048
+    beta: 1.0e-2
+    hidden_units: 256
+    summary_freq: 2000
+    time_horizon: 64
+    num_layers: 2
+
 SmallWallJumpLearning: 
     max_steps: 1.0e6
     batch_size: 128
