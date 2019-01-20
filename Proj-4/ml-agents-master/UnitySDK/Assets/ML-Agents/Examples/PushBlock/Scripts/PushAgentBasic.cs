@@ -1,4 +1,4 @@
-﻿//Put this script on your blue cube.
+//Put this script on your blue cube.
 
 using System.Collections;
 using System.Collections.Generic;
