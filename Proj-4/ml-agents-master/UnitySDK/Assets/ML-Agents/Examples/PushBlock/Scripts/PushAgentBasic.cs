@@ -109,8 +109,10 @@ public class PushAgentBasic : Agent
         int rotation = -90;
         Quaternion rot = Quaternion.AngleAxis(rotation, Vector3.up);
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, 2f, rewardCubes, QueryTriggerInteraction.Collide);
-        float startValue = GetClosestNode(hitColliders).GetComponent<NodeComponent>().value;
-        Debug.Log(startValue);
+        Collider nc = GetClosestNode(hitColliders);
+        float startValue = 0;
+        if (nc != null) startValue = nc.GetComponent<NodeComponent>().value;
+        //Debug.Log(startValue);
         float[] ret = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
         for (int i = 0; i < 8; i++)

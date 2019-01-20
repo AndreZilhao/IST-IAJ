@@ -21512,6 +21512,11 @@ Prefab:
       propertyPath: m_Name
       value: Area
       objectReference: {fileID: 0}
+    - target: {fileID: 114505490781873732, guid: 03bcc81e249714a22bb411dddcc5d15e,
+        type: 2}
+      propertyPath: layer.m_Bits
+      value: 16384
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03bcc81e249714a22bb411dddcc5d15e, type: 2}
   m_IsPrefabAsset: 0
@@ -27151,8 +27156,7 @@ MonoBehaviour:
   broadcastHub:
     broadcastingBrains:
     - {fileID: 11400000, guid: def67b495f96fa044847be946b9c6f64, type: 2}
-    _brainsToControl:
-    - {fileID: 11400000, guid: def67b495f96fa044847be946b9c6f64, type: 2}
+    _brainsToControl: []
   maxSteps: 0
   trainingConfiguration:
     width: 400
@@ -27193,10 +27197,10 @@ MonoBehaviour:
   - {fileID: 1632136582020284, guid: 25bc9b3c927394946ab89621ba4f9855, type: 2}
   - {fileID: 1870506039673922, guid: 0d04ed000b1b2754fbe91777a177a979, type: 2}
   - {fileID: 1700526287348420, guid: 7c461374e0d5dc74699a75b1c029d1be, type: 2}
-  agentRunSpeed: 2
+  agentRunSpeed: 1.5
   difficulty: 0
-  agentRotationSpeed: 15
-  spawnAreaMarginMultiplier: 0
+  agentRotationSpeed: 10
+  spawnAreaMarginMultiplier: 0.5
   goalScoredMaterial: {fileID: 2100000, guid: 80ffa2c5b96364e4b80fbb2e42b0af3d, type: 2}
   failMaterial: {fileID: 2100000, guid: 882d882b99bce44c6863ec8d3760e9ca, type: 2}
   gravityMultiplier: 5
