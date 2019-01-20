@@ -108,17 +108,21 @@ public class PushAgentBasic : Agent
         RaycastHit hit;
         int rotation = -90;
         Quaternion rot = Quaternion.AngleAxis(rotation, Vector3.up);
-        float[] ret = { 0, 0, 0, 0, 0 };
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 2f, rewardCubes, QueryTriggerInteraction.Collide);
+        float startValue = GetClosestNode(hitColliders).GetComponent<NodeComponent>().value;
+        Debug.Log(startValue);
+        float[] ret = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-        //5 rays [-0, -45, 0, 45, 90]
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 8; i++)
         {
             if (Physics.Raycast(rayHeight, transform.TransformDirection(rot * Vector3.forward), out hit, 3f, rewardCubes))
             {
                 NodeComponent n = hit.collider.GetComponent<NodeComponent>();
                 if (n != null)
                 {
-                    ret[i] = n.value;
+                    //normalized distance to start value
+                    if (n.value > startValue) ret[i] = 1;
+                    if (n.value < startValue) ret[i] = -1;
                 }
             }
             rotation += 45;
@@ -126,6 +130,37 @@ public class PushAgentBasic : Agent
         }
         return ret;
     }
+
+    Collider GetClosestNode(Collider[] Nodes)
+    {
+        Collider bestTarget = null;
+        float closestDistanceSqr = Mathf.Infinity;
+        Vector3 currentPosition = transform.position;
+        foreach (Collider potentialTarget in Nodes)
+        {
+            if (potentialTarget.GetComponent<NodeComponent>() == null) continue;
+            Vector3 directionToTarget = potentialTarget.transform.position - currentPosition;
+            float dSqrToTarget = directionToTarget.sqrMagnitude;
+            if (dSqrToTarget < closestDistanceSqr)
+            {
+                closestDistanceSqr = dSqrToTarget;
+                bestTarget = potentialTarget;
+            }
+        }
+        return bestTarget;
+    }
+
+    void ExplosionDamage(Vector3 center, float radius)
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(center, radius);
+        int i = 0;
+        while (i < hitColliders.Length)
+        {
+            hitColliders[i].SendMessage("AddDamage");
+            i++;
+        }
+    }
+
 
     /// <summary>
     /// Use the ground's bounds to pick a random spawn position.
@@ -291,7 +326,7 @@ public class PushAgentBasic : Agent
             localDifficulty = academy.difficulty;
         }
         //Selects a random map from available difficulties
-        int selectedDifficulty = Random.Range(0, localDifficulty);
+        int selectedDifficulty = Random.Range(0, localDifficulty+1);
         GameObject[] samples = academy.wallDifficulties[selectedDifficulty];
         //Instantiates a new map
         Destroy(map);
