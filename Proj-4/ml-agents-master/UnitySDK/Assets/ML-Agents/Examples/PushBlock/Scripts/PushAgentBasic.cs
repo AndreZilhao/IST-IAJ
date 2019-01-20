@@ -95,7 +95,7 @@ public class PushAgentBasic : Agent
             AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 0f, 0f));
             AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 1.5f, 0f));
             float[] f = CollectRewardObs();
-            Debug.Log("-90:" + f[0] + "  -45:" + f[1] + "  00:" + f[2] + "  +45:" + f[3] + "  +90:" + f[4] );
+            //Debug.Log("-90:" + f[0] + "  -45:" + f[1] + "  00:" + f[2] + "  +45:" + f[3] + "  +90:" + f[4] );
             // Aditional reward-cube observations.
             AddVectorObs(f);
         }
@@ -120,7 +120,9 @@ public class PushAgentBasic : Agent
                 NodeComponent n = hit.collider.GetComponent<NodeComponent>();
                 if (n != null)
                 {
-                    ret[i] = n.value - startValue;
+                    //normalized distance to start value
+                    if (n.value > startValue) ret[i] = 1;
+                    if (n.value < startValue) ret[i] = -1;
                 }
             }
             rotation += 45;
