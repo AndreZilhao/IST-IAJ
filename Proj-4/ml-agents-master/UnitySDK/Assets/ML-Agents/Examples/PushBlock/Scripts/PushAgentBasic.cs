@@ -90,11 +90,15 @@ public class PushAgentBasic : Agent
     {
         if (useVectorObs)
         {
-            var rayDistance = 12f;
-            float[] rayAngles = { 0f, 45f, 90f, 135f, 180f, 110f, 70f };
+            var rayDistance1 = 6f;
+            var rayDistance2 = 12f;
+            float[] rayAngles1 = { 0f, 180f, 110f, 70f };
+            float[] rayAngles2 = { 45f, 90f, 135f};
             var detectableObjects = new[] { "block", "goal", "wall" };
-            AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 0f, 0f));
-            AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 1.5f, 0f));
+            AddVectorObs(rayPer.Perceive(rayDistance1, rayAngles1, detectableObjects, 0f, 0f));
+            AddVectorObs(rayPer.Perceive(rayDistance1, rayAngles1, detectableObjects, 1.5f, 0f));
+            AddVectorObs(rayPer.Perceive(rayDistance2, rayAngles2, detectableObjects, 0f, 0f));
+            AddVectorObs(rayPer.Perceive(rayDistance2, rayAngles2, detectableObjects, 1.5f, 0f));
             float[] f = CollectRewardObs();
             //Debug.Log("-90:" + f[0] + "  -45:" + f[1] + "  00:" + f[2] + "  +45:" + f[3] + "  +90:" + f[4] );
             // Aditional reward-cube observations.
@@ -194,7 +198,7 @@ public class PushAgentBasic : Agent
     public void IScoredAGoal()
     {
         // We use a reward of 5.
-        AddReward(3f + academy.difficulty);
+        AddReward(2f + academy.difficulty);
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
