@@ -47,6 +47,7 @@ public class PushAgentBasic : Agent
 
     public bool useVectorObs;
     private int localDifficulty;
+    private int selectedDifficulty;
     private GameObject map;
 
     Rigidbody blockRB;  //cached on initialization
@@ -193,7 +194,7 @@ public class PushAgentBasic : Agent
     public void IScoredAGoal()
     {
         // We use a reward of 5.
-        AddReward(5f);
+        AddReward(5f*(selectedDifficulty+1));
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
@@ -328,7 +329,7 @@ public class PushAgentBasic : Agent
             localDifficulty = academy.difficulty;
         }
         //Selects a random map from available difficulties
-        int selectedDifficulty = Random.Range(0, localDifficulty+1);
+        selectedDifficulty = Random.Range(0, localDifficulty+1);
         GameObject[] samples = academy.wallDifficulties[selectedDifficulty];
         //Instantiates a new map
         Destroy(map);
