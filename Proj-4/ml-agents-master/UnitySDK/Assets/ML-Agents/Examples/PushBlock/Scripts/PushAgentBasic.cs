@@ -27,7 +27,7 @@ public class PushAgentBasic : Agent
     public LayerMask rewardCubes;
     PushBlockAcademy academy;
 
-    
+
 
     /// <summary>
     /// The goal to push the block to.
@@ -46,8 +46,9 @@ public class PushAgentBasic : Agent
     public GoalDetect goalDetect;
 
     public bool useVectorObs;
-    private int localDifficulty;
-    private int selectedDifficulty;
+    public bool useNodesObs;
+    private int localDifficulty = 0;
+    private int selectedDifficulty = 0;
     private GameObject map;
 
     Rigidbody blockRB;  //cached on initialization
@@ -72,7 +73,7 @@ public class PushAgentBasic : Agent
         goalDetect.agent = this;
         rayPer = GetComponent<RayPerception>();
         localDifficulty = academy.difficulty;
-        
+
 
         // Cache the agent rigidbody
         agentRB = GetComponent<Rigidbody>();
@@ -98,9 +99,9 @@ public class PushAgentBasic : Agent
             float[] f = CollectRewardObs();
             //Debug.Log("-90:" + f[0] + "  -45:" + f[1] + "  00:" + f[2] + "  +45:" + f[3] + "  +90:" + f[4] );
             // Aditional reward-cube observations.
-            AddVectorObs(f);
+            if(useNodesObs) AddVectorObs(f);
         }
-        
+
     }
 
     public float[] CollectRewardObs()
@@ -194,7 +195,7 @@ public class PushAgentBasic : Agent
     public void IScoredAGoal()
     {
         // We use a reward of 5.
-        AddReward(5f*(selectedDifficulty+1));
+        AddReward(5f * (selectedDifficulty + 1));
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
@@ -264,7 +265,7 @@ public class PushAgentBasic : Agent
         AddReward(-1f / agentParameters.maxStep);
 
         // Monitors the time left of the agent.
-        Monitor.Log("Life:", (10000f-GetStepCount())/10000f, this.transform);
+        Monitor.Log("Life:", (10000f - GetStepCount()) / 10000f, this.transform);
     }
 
     /// <summary>
@@ -332,12 +333,21 @@ public class PushAgentBasic : Agent
         {
             localDifficulty = academy.difficulty;
         }
-        //Selects a random map from available difficulties
-        selectedDifficulty = Random.Range(0, localDifficulty+1);
+
+        //Selects a random map from available difficulties if not using less maps.
+        if (academy.useLessMaps)
+        {
+            selectedDifficulty = 3;
+        }
+        else
+        {
+            selectedDifficulty = Random.Range(0, localDifficulty + 1);
+        }
+           
         GameObject[] samples = academy.wallDifficulties[selectedDifficulty];
 
         //Using custom maps
-        if(samples.Length != 0)
+        if (samples.Length != 0)
         {
             Destroy(map);
             int n = Random.Range(0, samples.Length);
@@ -345,7 +355,7 @@ public class PushAgentBasic : Agent
             Monitor.Log("Map: ", selectedDifficulty.ToString() + "-" + n);
             Monitor.Log("Difficulty: ", localDifficulty.ToString());
         }
-        
+
         int rotation = Random.Range(0, 4);
         float rotationAngle = rotation * 90f;
         area.transform.Rotate(new Vector3(0f, rotationAngle, 0f));

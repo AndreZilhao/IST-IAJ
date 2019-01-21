@@ -12,20 +12,20 @@ public class PushBlockAcademy : Academy
     [HideInInspector]
     public GameObject[][] wallDifficulties;
 
-    public GameObject[] wallsEasy;
-    public GameObject[] wallsMedium;
-    public GameObject[] wallsHard;
-    public GameObject[] wallsVeryHard;
-
     /// <summary>
     /// The "walking speed" of the agents in the scene. 
     /// </summary>
 	public float agentRunSpeed;
 
+    /// <summary>
+    /// Whether to use only the maps of the current difficulty. Useful for benchmarking 
+    /// </summary>
+    public bool useLessMaps;
+
     //Curriculum stats
     [HideInInspector]
 
-    public int difficulty = 3;
+    public int difficulty = 2;
 
     /// <summary>
     /// The agent rotation speed.
@@ -57,6 +57,11 @@ public class PushBlockAcademy : Academy
     /// Use ~3 to make things less floaty
     /// </summary>
 	public float gravityMultiplier;
+
+    public GameObject[] wallsEasy;
+    public GameObject[] wallsMedium;
+    public GameObject[] wallsHard;
+    public GameObject[] wallsVeryHard;
 
     void State()
     {
