@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using UnityEditor.SceneManagement;
+
 using UnityEngine.SceneManagement;
 
 public class IAJMenuItems
@@ -138,4 +140,4 @@ public class IAJMenuItems
     }
 
 }
-
+#endif

@@ -1,18 +1,16 @@
-//Put this script on your blue cube.
+﻿//Put this script on your blue cube.
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MLAgents;
 
-public class PushAgentBasic : Agent
+public class PushAgentVisual: Agent
 {
     /// <summary>
     /// The ground. The bounds are used to spawn the elements.
     /// </summary>
-    /// 
-    public GameObject[] walls;
-    public GameObject ground;
+	public GameObject ground;
 
     public GameObject area;
 
@@ -22,12 +20,7 @@ public class PushAgentBasic : Agent
 	[HideInInspector]
     public Bounds areaBounds;
 
-
-    public LayerMask layer;
-    public LayerMask rewardCubes;
     PushBlockAcademy academy;
-
-    
 
     /// <summary>
     /// The goal to push the block to.
@@ -43,12 +36,9 @@ public class PushAgentBasic : Agent
     /// Detects when the block touches the goal.
     /// </summary>
 	[HideInInspector]
-    public GoalDetect goalDetect;
+    public GoalDetectVisual goalDetect;
 
     public bool useVectorObs;
-    private int localDifficulty;
-    private int selectedDifficulty;
-    private GameObject map;
 
     Rigidbody blockRB;  //cached on initialization
     Rigidbody agentRB;  //cached on initialization
@@ -68,11 +58,9 @@ public class PushAgentBasic : Agent
     public override void InitializeAgent()
     {
         base.InitializeAgent();
-        goalDetect = block.GetComponent<GoalDetect>();
+        goalDetect = block.GetComponent<GoalDetectVisual>();
         goalDetect.agent = this;
         rayPer = GetComponent<RayPerception>();
-        localDifficulty = academy.difficulty;
-        
 
         // Cache the agent rigidbody
         agentRB = GetComponent<Rigidbody>();
@@ -95,75 +83,8 @@ public class PushAgentBasic : Agent
             var detectableObjects = new[] { "block", "goal", "wall" };
             AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 0f, 0f));
             AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 1.5f, 0f));
-            float[] f = CollectRewardObs();
-            //Debug.Log("-90:" + f[0] + "  -45:" + f[1] + "  00:" + f[2] + "  +45:" + f[3] + "  +90:" + f[4] );
-            // Aditional reward-cube observations.
-            AddVectorObs(f);
-        }
-        
-    }
-
-    public float[] CollectRewardObs()
-    {
-        Vector3 rayHeight = transform.position + new Vector3(0, -0.5f, 0);
-        RaycastHit hit;
-        int rotation = -90;
-        Quaternion rot = Quaternion.AngleAxis(rotation, Vector3.up);
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 2f, rewardCubes, QueryTriggerInteraction.Collide);
-        Collider nc = GetClosestNode(hitColliders);
-        float startValue = 0;
-        if (nc != null) startValue = nc.GetComponent<NodeComponent>().value;
-        //Debug.Log(startValue);
-        float[] ret = { 0, 0, 0, 0, 0, 0, 0, 0 };
-
-        for (int i = 0; i < 8; i++)
-        {
-            if (Physics.Raycast(rayHeight, transform.TransformDirection(rot * Vector3.forward), out hit, 3f, rewardCubes))
-            {
-                NodeComponent n = hit.collider.GetComponent<NodeComponent>();
-                if (n != null)
-                {
-                    //normalized distance to start value
-                    if (n.value > startValue) ret[i] = 1;
-                    if (n.value < startValue) ret[i] = -1;
-                }
-            }
-            rotation += 45;
-            rot = Quaternion.AngleAxis(rotation, Vector3.up);
-        }
-        return ret;
-    }
-
-    Collider GetClosestNode(Collider[] Nodes)
-    {
-        Collider bestTarget = null;
-        float closestDistanceSqr = Mathf.Infinity;
-        Vector3 currentPosition = transform.position;
-        foreach (Collider potentialTarget in Nodes)
-        {
-            if (potentialTarget.GetComponent<NodeComponent>() == null) continue;
-            Vector3 directionToTarget = potentialTarget.transform.position - currentPosition;
-            float dSqrToTarget = directionToTarget.sqrMagnitude;
-            if (dSqrToTarget < closestDistanceSqr)
-            {
-                closestDistanceSqr = dSqrToTarget;
-                bestTarget = potentialTarget;
-            }
-        }
-        return bestTarget;
-    }
-
-    void ExplosionDamage(Vector3 center, float radius)
-    {
-        Collider[] hitColliders = Physics.OverlapSphere(center, radius);
-        int i = 0;
-        while (i < hitColliders.Length)
-        {
-            hitColliders[i].SendMessage("AddDamage");
-            i++;
         }
     }
-
 
     /// <summary>
     /// Use the ground's bounds to pick a random spawn position.
@@ -180,7 +101,7 @@ public class PushAgentBasic : Agent
             float randomPosZ = Random.Range(-areaBounds.extents.z * academy.spawnAreaMarginMultiplier,
                                             areaBounds.extents.z * academy.spawnAreaMarginMultiplier);
             randomSpawnPos = ground.transform.position + new Vector3(randomPosX, 1f, randomPosZ);
-            if (Physics.CheckBox(randomSpawnPos, new Vector3(2.5f, 0.01f, 2.5f), Quaternion.identity, layer) == false)
+            if (Physics.CheckBox(randomSpawnPos, new Vector3(2.5f, 0.01f, 2.5f)) == false)
             {
                 foundNewSpawnLocation = true;
             }
@@ -194,7 +115,7 @@ public class PushAgentBasic : Agent
     public void IScoredAGoal()
     {
         // We use a reward of 5.
-        AddReward(3f + academy.difficulty);
+        AddReward(5f);
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
@@ -223,6 +144,7 @@ public class PushAgentBasic : Agent
         Vector3 rotateDir = Vector3.zero;
 
         int action = Mathf.FloorToInt(act[0]);
+        
 
         // Goalies and Strikers have slightly different action spaces.
         switch (action)
@@ -262,9 +184,6 @@ public class PushAgentBasic : Agent
 
         // Penalty given each step to encourage agent to finish task quickly.
         AddReward(-1f / agentParameters.maxStep);
-
-        // Monitors the time left of the agent.
-        Monitor.Log("Life:", (10000f-GetStepCount())/10000f, this.transform);
     }
 
     /// <summary>
@@ -282,44 +201,6 @@ public class PushAgentBasic : Agent
         blockRB.angularVelocity = Vector3.zero;
     }
 
-    void SelectRandomWall(int difficulty)
-    {
-        //Get wall selection for given difficulty
-        Transform[] children = GetTopLevelChildren(walls[difficulty].transform);
-
-        int selectedWall = Random.Range(0, children.Length);
-        DeactivateWalls(children);
-        //Activate the randomly selected wall
-        children[selectedWall].GetComponentInChildren<Transform>(true).gameObject.SetActive(true);
-    }
-
-    void DeactivateWalls(int difficulty)
-    {
-        Transform[] children = GetTopLevelChildren(walls[difficulty].transform);
-        for (int i = 0; i < children.Length; i++)
-        {
-            children[i].GetComponentInChildren<Transform>(true).gameObject.SetActive(false);
-        }
-    }
-
-    void DeactivateWalls(Transform[] children)
-    {
-        for (int i = 0; i < children.Length; i++)
-        {
-            children[i].GetComponentInChildren<Transform>(true).gameObject.SetActive(false);
-        }
-    }
-
-    public static Transform[] GetTopLevelChildren(Transform Parent)
-    {
-        Transform[] Children = new Transform[Parent.childCount];
-        for (int ID = 0; ID < Parent.childCount; ID++)
-        {
-            Children[ID] = Parent.GetChild(ID);
-        }
-        return Children;
-    }
-
 
     /// <summary>
     /// In the editor, if "Reset On Done" is checked then AgentReset() will be 
@@ -327,28 +208,10 @@ public class PushAgentBasic : Agent
     /// </summary>
 	public override void AgentReset()
     {
-        Monitor.SetActive(true);
-        if (localDifficulty < academy.difficulty)
-        {
-            localDifficulty = academy.difficulty;
-        }
-        //Selects a random map from available difficulties
-        selectedDifficulty = Random.Range(0, localDifficulty+1);
-        GameObject[] samples = academy.wallDifficulties[selectedDifficulty];
-
-        //Using custom maps
-        if(samples.Length != 0)
-        {
-            Destroy(map);
-            int n = Random.Range(0, samples.Length);
-            map = Instantiate(samples[n], area.transform);
-            Monitor.Log("Map: ", selectedDifficulty.ToString() + "-" + n);
-            Monitor.Log("Difficulty: ", localDifficulty.ToString());
-        }
-        
         int rotation = Random.Range(0, 4);
         float rotationAngle = rotation * 90f;
         area.transform.Rotate(new Vector3(0f, rotationAngle, 0f));
+
         ResetBlock();
         transform.position = GetRandomSpawnPos();
         agentRB.velocity = Vector3.zero;
