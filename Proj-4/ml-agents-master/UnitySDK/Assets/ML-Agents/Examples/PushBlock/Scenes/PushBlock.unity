@@ -21512,11 +21512,6 @@ Prefab:
       propertyPath: m_Name
       value: Area
       objectReference: {fileID: 0}
-    - target: {fileID: 114505490781873732, guid: 03bcc81e249714a22bb411dddcc5d15e,
-        type: 2}
-      propertyPath: layer.m_Bits
-      value: 16384
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03bcc81e249714a22bb411dddcc5d15e, type: 2}
   m_IsPrefabAsset: 0
