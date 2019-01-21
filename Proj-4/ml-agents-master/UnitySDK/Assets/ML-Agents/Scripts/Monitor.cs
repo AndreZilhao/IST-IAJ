@@ -386,8 +386,8 @@ namespace MLAgents
                 }
 
                 float widthScaler = (Screen.width / 1000f);
-                float keyPixelWidth = 100 * widthScaler;
-                float keyPixelHeight = 20 * widthScaler;
+                float keyPixelWidth = 50 * widthScaler;
+                float keyPixelHeight = 10 * widthScaler;
                 float paddingwidth = 10 * widthScaler;
 
                 float scale = 1f;
@@ -408,7 +408,7 @@ namespace MLAgents
                 keyPixelWidth *= scale;
                 keyPixelHeight *= scale;
                 paddingwidth *= scale;
-                keyStyle.fontSize = (int) (keyPixelHeight * 0.8f);
+                keyStyle.fontSize = (int) (keyPixelHeight * 1f);
                 if (keyStyle.fontSize < 2)
                 {
                     continue;

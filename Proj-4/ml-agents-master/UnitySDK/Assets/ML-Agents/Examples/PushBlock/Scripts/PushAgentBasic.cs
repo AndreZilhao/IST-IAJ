@@ -262,6 +262,9 @@ public class PushAgentBasic : Agent
 
         // Penalty given each step to encourage agent to finish task quickly.
         AddReward(-1f / agentParameters.maxStep);
+
+        // Monitors the time left of the agent.
+        Monitor.Log("Life:", (10000f-GetStepCount())/10000f, this.transform);
     }
 
     /// <summary>
@@ -324,16 +327,25 @@ public class PushAgentBasic : Agent
     /// </summary>
 	public override void AgentReset()
     {
-        if(localDifficulty < academy.difficulty)
+        Monitor.SetActive(true);
+        if (localDifficulty < academy.difficulty)
         {
             localDifficulty = academy.difficulty;
         }
         //Selects a random map from available difficulties
         selectedDifficulty = Random.Range(0, localDifficulty+1);
         GameObject[] samples = academy.wallDifficulties[selectedDifficulty];
-        //Instantiates a new map
-        Destroy(map);
-        map = Instantiate(samples[Random.Range(0, samples.Length)], area.transform);
+
+        //Using custom maps
+        if(samples.Length != 0)
+        {
+            Destroy(map);
+            int n = Random.Range(0, samples.Length);
+            map = Instantiate(samples[n], area.transform);
+            Monitor.Log("Map: ", selectedDifficulty.ToString() + "-" + n);
+            Monitor.Log("Difficulty: ", localDifficulty.ToString());
+        }
+        
         int rotation = Random.Range(0, 4);
         float rotationAngle = rotation * 90f;
         area.transform.Rotate(new Vector3(0f, rotationAngle, 0f));
