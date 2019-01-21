@@ -38,9 +38,10 @@ GameObject:
   - component: {fileID: 65084077644419200}
   - component: {fileID: 23448481644520252}
   - component: {fileID: 54730943036608338}
+  - component: {fileID: 114307495936570092}
   - component: {fileID: 114350292539814250}
   - component: {fileID: 136392111213536030}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Block
   m_TagString: block
   m_Icon: {fileID: 0}
@@ -97,7 +98,7 @@ GameObject:
   - component: {fileID: 54817351390947638}
   - component: {fileID: 114505490781873732}
   - component: {fileID: 114421647563711602}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Agent
   m_TagString: agent
   m_Icon: {fileID: 0}
@@ -584,6 +585,21 @@ AudioListener:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1357353492956254}
   m_Enabled: 1
+--- !u!114 &114307495936570092
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1293433783856340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44309eb7eb399684cbeb618b2804d3d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 1489716781518988}
+  agentMask:
+    serializedVersion: 2
+    m_Bits: 2048
 --- !u!114 &114350292539814250
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -618,7 +634,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dea8c4f2604b947e6b7b97750dde87ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brain: {fileID: 11400000, guid: e8b2d719f6a324b1abb68d8cf2859f5c, type: 2}
+  brain: {fileID: 11400000, guid: dd07b1953eac4411b81fba032f394726, type: 2}
   agentParameters:
     agentCameras:
     - {fileID: 0}
@@ -639,6 +655,9 @@ MonoBehaviour:
   layer:
     serializedVersion: 2
     m_Bits: 0
+  blockLayer:
+    serializedVersion: 2
+    m_Bits: 512
   rewardCubes:
     serializedVersion: 2
     m_Bits: 49152

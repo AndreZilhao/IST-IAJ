@@ -24,6 +24,7 @@ public class PushAgentBasic : Agent
 
 
     public LayerMask layer;
+    public LayerMask blockLayer;
     public LayerMask rewardCubes;
     PushBlockAcademy academy;
 
@@ -198,8 +199,8 @@ public class PushAgentBasic : Agent
     /// </summary>
     public void IScoredAGoal()
     {
-        // We use a reward of 5.
-        AddReward(2f + academy.difficulty);
+        // We use a reward of 2 + Difficulty level.
+        //AddReward(2f + academy.difficulty);
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
