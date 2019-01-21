@@ -341,7 +341,7 @@ public class PushAgentBasic : Agent
         //Selects a random map from available difficulties if not using less maps.
         if (academy.useLessMaps)
         {
-            selectedDifficulty = 3;
+            selectedDifficulty = localDifficulty;
         }
         else
         {
