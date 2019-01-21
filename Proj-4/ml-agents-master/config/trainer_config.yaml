@@ -49,7 +49,7 @@ pblr:
     use_recurrent: true
     sequence_length: 64
     memory_size: 256
-    max_steps: 5.0e5
+    max_steps: 3.0e5
     batch_size: 128
     buffer_size: 10240
     beta: 1.0e-2
