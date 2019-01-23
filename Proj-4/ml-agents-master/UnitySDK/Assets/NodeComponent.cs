@@ -30,7 +30,7 @@ public class NodeComponent : MonoBehaviour {
         if (!visited)
         {
             visited = true;
-            gameObject.SetActive(false);
+            if( !this.gameObject.tag.Equals("block")) gameObject.SetActive(false);
             return true;
         }
         return false;
@@ -38,7 +38,7 @@ public class NodeComponent : MonoBehaviour {
 
     private void Update()
     {
-        if (visited)
+        if (visited && !this.gameObject.tag.Equals("block"))
         {
             c.r = 0;
             c.g = 0;

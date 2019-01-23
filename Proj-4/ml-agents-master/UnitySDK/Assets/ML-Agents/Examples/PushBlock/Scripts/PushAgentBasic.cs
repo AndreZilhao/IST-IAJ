@@ -100,7 +100,7 @@ public class PushAgentBasic : Agent
             n.Unlight();
         }*/
         //visibleNodes.Clear();
-        Vector3 rayHeight = transform.position + new Vector3(0, -0.5f, 0);
+        Vector3 rayHeight = transform.position + new Vector3(0, -0.2f, 0);
         RaycastHit hit;
         float rotation = 0;
         Quaternion rot = Quaternion.AngleAxis(rotation, Vector3.up);
@@ -108,12 +108,25 @@ public class PushAgentBasic : Agent
         {
             if (Physics.Raycast(rayHeight, transform.TransformDirection(rot * Vector3.forward), out hit, 10f, rewardCubes))
             {
+
                 NodeComponent n = hit.collider.GetComponent<NodeComponent>();
                 if (n != null)
                 {
                     visibleNodes.Add(n);
                     n.Light();
                 }
+
+            }
+            if (Physics.Raycast(rayHeight + new Vector3(0,1f,0), transform.TransformDirection(rot * Vector3.forward), out hit, 10f, rewardCubes))
+            {
+
+                NodeComponent n = hit.collider.GetComponent<NodeComponent>();
+                if (n != null)
+                {
+                    visibleNodes.Add(n);
+                    n.Light();
+                }
+
             }
             rotation += 22.5f;
             rot = Quaternion.AngleAxis(rotation, Vector3.up);
@@ -375,7 +388,10 @@ public class PushAgentBasic : Agent
     /// </summary>
 	public override void AgentReset()
     {
+
+        //PopulateNodes();
         Monitor.SetActive(true);
+        block.GetComponent<Renderer>().enabled = false;
         if (localDifficulty < academy.difficulty)
         {
             localDifficulty = academy.difficulty;
