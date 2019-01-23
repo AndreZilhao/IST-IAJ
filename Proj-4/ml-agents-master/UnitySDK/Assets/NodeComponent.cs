@@ -8,14 +8,21 @@ public class NodeComponent : MonoBehaviour {
     public float value;
     public bool Goal;
     public bool visited;
+    Renderer r;
     Material m;
     Color c;
+
+    private void Awake()
+    {
+        r = GetComponent<Renderer>();
+        m = GetComponent<Renderer>().material;
+    }
 
     private void Start()
     {
         visited = false;
-        m = GetComponent<Renderer>().material;
         c = m.color;
+        Unlight();
     }
 
     public bool Visit()
@@ -23,6 +30,7 @@ public class NodeComponent : MonoBehaviour {
         if (!visited)
         {
             visited = true;
+            gameObject.SetActive(false);
             return true;
         }
         return false;
@@ -45,6 +53,17 @@ public class NodeComponent : MonoBehaviour {
        // c.g = value;
         m.color = c;
         GetComponent<Renderer>().material = m;
+    }
+
+    public void Unlight()
+    {
+        if(this.gameObject.activeInHierarchy)
+            r.enabled = false;
+    }
+
+    public void Light()
+    {
+        r.enabled = true;
     }
 
     public void OnDestroy()
