@@ -167,7 +167,7 @@ Transform:
   m_GameObject: {fileID: 1489716781518988}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: -4.43}
-  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
+  m_LocalScale: {x: 1.5, y: 0.75, z: 1.5}
   m_Children:
   - {fileID: 4469888496441150}
   m_Father: {fileID: 4006990431719496}
@@ -206,8 +206,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1738131294272224}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalPosition: {x: 0, y: 0.42, z: 0.5}
+  m_LocalScale: {x: 1, y: 0.2, z: 0.2}
   m_Children: []
   m_Father: {fileID: 4188187884171146}
   m_RootOrder: 0
@@ -433,7 +433,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 0483e5b320b23418b8318497c636bf8e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -526,7 +526,7 @@ BoxCollider:
   m_GameObject: {fileID: 1738131294272224}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -564,7 +564,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.5, y: 1, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &65797106708039188
 BoxCollider:
@@ -638,7 +638,7 @@ MonoBehaviour:
   agentParameters:
     agentCameras:
     - {fileID: 20835536364241910}
-    maxStep: 10000
+    maxStep: 2000
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 5
@@ -664,7 +664,7 @@ MonoBehaviour:
   goal: {fileID: 1441513772919942}
   block: {fileID: 1293433783856340}
   goalDetect: {fileID: 0}
-  useVectorObs: 0
+  useVectorObs: 1
   useNodesObs: 0
 --- !u!124 &124162893902680432
 Behaviour:

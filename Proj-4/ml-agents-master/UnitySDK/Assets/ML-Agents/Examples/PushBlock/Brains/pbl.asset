@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Name: pbl
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 70
-    numStackedVectorObservations: 5
-    vectorActionSize: 07000000
-    cameraResolutions: []
+    vectorObservationSize: 0
+    numStackedVectorObservations: 3
+    vectorActionSize: 05000000
+    cameraResolutions:
+    - width: 84
+      height: 84
+      blackAndWhite: 0
     vectorActionDescriptions:
     - 
     vectorActionSpaceType: 0

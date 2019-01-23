@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,9 +45,7 @@ public class NodeComponent : MonoBehaviour {
             c.b = 1;
         } else
         {
-            c.r = 1;
-            c.g = 0;
-            c.b = 0;
+            GetComponent<Renderer>().enabled = false;
         }
        // c.r = 1-value;
        // c.g = value;

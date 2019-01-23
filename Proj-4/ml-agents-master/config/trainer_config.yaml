@@ -35,14 +35,19 @@ BouncerLearning:
     hidden_units: 64
 
 pbl:
-    max_steps: 3.0e5
-    batch_size: 128
-    buffer_size: 10240
+    use_recurrent: true
+    sequence_length: 32
+    num_layers: 1
+    hidden_units: 128
+    memory_size: 256
     beta: 1.0e-2
-    hidden_units: 256
+    gamma: 0.99
+    num_epoch: 3
+    buffer_size: 10240
+    batch_size: 64
+    max_steps: 5.0e5
     summary_freq: 2000
     time_horizon: 500
-    num_layers: 2
 
 
 pblr:

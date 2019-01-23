@@ -1,10 +1,10 @@
 {
     "measure" : "reward",
-    "thresholds" : [1.9, 2.8, 3.5],
+    "thresholds" : [4.9, 4.7, 4.5],
     "min_lesson_length" : 1000,
     "signal_smoothing" : true, 
     "parameters" : 
     {
-        "Difficulty" : [0, 1, 2, 3]
+        "Difficulty" : [1, 1, 2, 3]
     }
 }

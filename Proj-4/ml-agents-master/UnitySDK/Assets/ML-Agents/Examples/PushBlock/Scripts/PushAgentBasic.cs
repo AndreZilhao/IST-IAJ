@@ -37,6 +37,7 @@ public class PushAgentBasic : Agent
     /// The goal to push the block to.
     /// </summary>
     public GameObject goal;
+    public GameObject compass;
 
     /// <summary>
     /// The block to be pushed to the goal.
@@ -132,6 +133,7 @@ public class PushAgentBasic : Agent
             rot = Quaternion.AngleAxis(rotation, Vector3.up);
         }
 
+        float[] f = CollectRewardObs();
         if (useVectorObs)
         {
             var rayDistance1 = 6f;
@@ -143,11 +145,12 @@ public class PushAgentBasic : Agent
             AddVectorObs(rayPer.Perceive(rayDistance1, rayAngles1, detectableObjects, 1.5f, 0f));
             AddVectorObs(rayPer.Perceive(rayDistance2, rayAngles2, detectableObjects, 0f, 0f));
             AddVectorObs(rayPer.Perceive(rayDistance2, rayAngles2, detectableObjects, 1.5f, 0f));
-            float[] f = CollectRewardObs();
             //Debug.Log("-90:" + f[0] + "  -45:" + f[1] + "  00:" + f[2] + "  +45:" + f[3] + "  +90:" + f[4] );
             // Aditional reward-cube observations.
             if(useNodesObs) AddVectorObs(f);
         }
+
+        compass.transform.rotation = this.transform.rotation;
 
     }
 
@@ -203,7 +206,7 @@ public class PushAgentBasic : Agent
             if (nodeComponent.Visit())
             {
                 AddReward(0.05f);
-                Debug.Log("yay!");
+                //Debug.Log("yay!");
             }
             if (dSqrToTarget < closestDistanceSqr)
             {
@@ -213,18 +216,6 @@ public class PushAgentBasic : Agent
         }
         return bestTarget;
     }
-
-    void ExplosionDamage(Vector3 center, float radius)
-    {
-        Collider[] hitColliders = Physics.OverlapSphere(center, radius);
-        int i = 0;
-        while (i < hitColliders.Length)
-        {
-            hitColliders[i].SendMessage("AddDamage");
-            i++;
-        }
-    }
-
 
     /// <summary>
     /// Use the ground's bounds to pick a random spawn position.
@@ -255,7 +246,7 @@ public class PushAgentBasic : Agent
     public void IScoredAGoal()
     {
         // We use a reward of 2 + Difficulty level.
-        //AddReward(2f + academy.difficulty);
+        AddReward(5f);
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
@@ -295,16 +286,16 @@ public class PushAgentBasic : Agent
                 dirToGo = transform.forward * -1f;
                 break;
             case 3:
-                rotateDir = transform.up * 1f;
+                dirToGo = transform.right * +0.75f;
                 break;
             case 4:
-                rotateDir = transform.up * -1f;
-                break;
-            case 5:
                 dirToGo = transform.right * -0.75f;
                 break;
+            case 5:
+                rotateDir = transform.up * 1f;
+                break;
             case 6:
-                dirToGo = transform.right * 0.75f;
+                rotateDir = transform.up * -1f;
                 break;
         }
         transform.Rotate(rotateDir, Time.fixedDeltaTime * 200f);
@@ -422,9 +413,22 @@ public class PushAgentBasic : Agent
         int rotation = Random.Range(0, 4);
         float rotationAngle = rotation * 90f;
         area.transform.Rotate(new Vector3(0f, rotationAngle, 0f));
-        ResetBlock();
+        ResetBlock1();
         transform.position = GetRandomSpawnPos();
         agentRB.velocity = Vector3.zero;
         agentRB.angularVelocity = Vector3.zero;
+        //transform.Rotate(new Vector3(0f, Random.Range(0, 8) * 45f, 0f));
+    }
+
+    void ResetBlock1()
+    {
+        // Get a random position for the block.
+        block.transform.position = GetRandomSpawnPos();
+
+        // Reset block velocity back to zero.
+        blockRB.velocity = Vector3.zero;
+
+        // Reset block angularVelocity back to zero.
+        blockRB.angularVelocity = Vector3.zero;
     }
 }
