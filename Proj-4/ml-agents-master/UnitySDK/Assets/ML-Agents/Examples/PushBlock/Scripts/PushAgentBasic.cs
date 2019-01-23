@@ -118,7 +118,13 @@ public class PushAgentBasic : Agent
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, 2f, rewardCubes, QueryTriggerInteraction.Collide);
         Collider nc = GetClosestNode(hitColliders);
         float startValue = 0;
-        if (nc != null) startValue = nc.GetComponent<NodeComponent>().value;
+        NodeComponent ncc = null;
+        if (nc != null)
+        {
+            ncc = nc.GetComponent<NodeComponent>();
+            startValue = ncc.value;
+        }
+
         //Debug.Log(startValue);
         float[] ret = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -145,11 +151,18 @@ public class PushAgentBasic : Agent
         Collider bestTarget = null;
         float closestDistanceSqr = Mathf.Infinity;
         Vector3 currentPosition = transform.position;
+        NodeComponent nodeComponent = null;
         foreach (Collider potentialTarget in Nodes)
         {
-            if (potentialTarget.GetComponent<NodeComponent>() == null) continue;
+            nodeComponent = potentialTarget.GetComponent<NodeComponent>();
+            if (nodeComponent == null) continue;
             Vector3 directionToTarget = potentialTarget.transform.position - currentPosition;
             float dSqrToTarget = directionToTarget.sqrMagnitude;
+            if (nodeComponent.Visit())
+            {
+                AddReward(0.05f);
+                Debug.Log("yay!");
+            }
             if (dSqrToTarget < closestDistanceSqr)
             {
                 closestDistanceSqr = dSqrToTarget;
