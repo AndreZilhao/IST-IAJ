@@ -26,7 +26,10 @@ public class PushAgentBasic : Agent
     public LayerMask layer;
     public LayerMask blockLayer;
     public LayerMask rewardCubes;
+    private List<NodeComponent> nodes;
+    private List<NodeComponent> visibleNodes;
     PushBlockAcademy academy;
+
 
 
 
@@ -69,6 +72,7 @@ public class PushAgentBasic : Agent
 
     public override void InitializeAgent()
     {
+        visibleNodes = new List<NodeComponent>();
         base.InitializeAgent();
         goalDetect = block.GetComponent<GoalDetect>();
         goalDetect.agent = this;
@@ -90,6 +94,44 @@ public class PushAgentBasic : Agent
 
     public override void CollectObservations()
     {
+        /*
+        foreach(NodeComponent n in visibleNodes)
+        {
+            n.Unlight();
+        }*/
+        //visibleNodes.Clear();
+        Vector3 rayHeight = transform.position + new Vector3(0, -0.2f, 0);
+        RaycastHit hit;
+        float rotation = 0;
+        Quaternion rot = Quaternion.AngleAxis(rotation, Vector3.up);
+        for (int i = 0; i < 16; i++)
+        {
+            if (Physics.Raycast(rayHeight, transform.TransformDirection(rot * Vector3.forward), out hit, 10f, rewardCubes))
+            {
+
+                NodeComponent n = hit.collider.GetComponent<NodeComponent>();
+                if (n != null)
+                {
+                    visibleNodes.Add(n);
+                    n.Light();
+                }
+
+            }
+            if (Physics.Raycast(rayHeight + new Vector3(0,1f,0), transform.TransformDirection(rot * Vector3.forward), out hit, 10f, rewardCubes))
+            {
+
+                NodeComponent n = hit.collider.GetComponent<NodeComponent>();
+                if (n != null)
+                {
+                    visibleNodes.Add(n);
+                    n.Light();
+                }
+
+            }
+            rotation += 22.5f;
+            rot = Quaternion.AngleAxis(rotation, Vector3.up);
+        }
+
         if (useVectorObs)
         {
             var rayDistance1 = 6f;
@@ -346,7 +388,10 @@ public class PushAgentBasic : Agent
     /// </summary>
 	public override void AgentReset()
     {
+
+        //PopulateNodes();
         Monitor.SetActive(true);
+        block.GetComponent<Renderer>().enabled = false;
         if (localDifficulty < academy.difficulty)
         {
             localDifficulty = academy.difficulty;
