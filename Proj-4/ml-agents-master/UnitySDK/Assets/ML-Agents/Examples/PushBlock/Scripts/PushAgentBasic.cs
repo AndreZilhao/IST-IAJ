@@ -95,6 +95,7 @@ public class PushAgentBasic : Agent
 
     public override void CollectObservations()
     {
+        float[] f = CollectRewardObs();
         /*
         foreach(NodeComponent n in visibleNodes)
         {
