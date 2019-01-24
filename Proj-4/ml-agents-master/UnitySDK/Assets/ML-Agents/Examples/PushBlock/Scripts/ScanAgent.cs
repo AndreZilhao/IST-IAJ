@@ -26,7 +26,7 @@ public class ScanAgent : Agent
     public LayerMask blockLayer;
     public LayerMask rewardCubes;
     public LayerMask wallsLayer;
-    public GameObject pushAgent;
+    public PushAgentBasic pushAgent;
     public bool active;
     private List<NodeComponent> nodes;
     private List<NodeComponent> visibleNodes;
@@ -70,6 +70,7 @@ public class ScanAgent : Agent
     {
         base.InitializeAgent();
         localDifficulty = academy.difficulty;
+        pushAgent = GetComponent<PushAgentBasic>();
 
 
         // Cache the agent rigidbody
@@ -109,6 +110,10 @@ public class ScanAgent : Agent
             }
             rotation += 22.5f;
             rot = Quaternion.AngleAxis(rotation, Vector3.up);
+        }
+        if(pushAgent.GetStepCount() > 3000)
+        {
+            this.TouchDown();
         }
     }
 
@@ -155,8 +160,12 @@ public class ScanAgent : Agent
     /// </summary>
     public void TouchDown()
     {
-        pushAgent.SetActive(true);
-        this.SetActive(false);
+        if(pushAgent != null)
+        {
+            pushAgent.SetActive(true);
+            this.SetActive(false);
+        }
+        
     }
 
     /// <summary>

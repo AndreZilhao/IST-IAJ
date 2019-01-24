@@ -69,7 +69,7 @@ public class PushAgentBasic : Agent
         academy = FindObjectOfType<PushBlockAcademy>(); //cache the academy
     }
 
-    void SetActive(bool flag)
+    public void SetActive(bool flag)
     {
         active = flag;
     }
@@ -214,7 +214,7 @@ public class PushAgentBasic : Agent
     public void IScoredAGoal()
     {
         // We use a reward of 5.
-        AddReward(2f + localDifficulty);
+        AddReward(1f);
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
@@ -284,7 +284,7 @@ public class PushAgentBasic : Agent
             MoveAgent(vectorAction);
 
             // Penalty given each step to encourage agent to finish task quickly.
-            AddReward(-1f / agentParameters.maxStep);
+            //AddReward(-1f / agentParameters.maxStep);
 
             // Monitors the time left of the agent.
             Monitor.Log("Life:", (10000f - GetStepCount()) / 10000f, this.transform);
