@@ -1,4 +1,4 @@
-//Put this script on your blue cube.
+﻿//Put this script on your blue cube.
 
 using System.Collections;
 using System.Collections.Generic;
@@ -24,12 +24,9 @@ public class PushAgentBasic : Agent
 
 
     public LayerMask layer;
-    public LayerMask blockLayer;
     public LayerMask rewardCubes;
-    private List<NodeComponent> nodes;
-    private List<NodeComponent> visibleNodes;
+    public LayerMask wallsLayer;
     PushBlockAcademy academy;
-
 
 
 
@@ -72,7 +69,6 @@ public class PushAgentBasic : Agent
 
     public override void InitializeAgent()
     {
-        visibleNodes = new List<NodeComponent>();
         base.InitializeAgent();
         goalDetect = block.GetComponent<GoalDetect>();
         goalDetect.agent = this;
@@ -94,59 +90,25 @@ public class PushAgentBasic : Agent
 
     public override void CollectObservations()
     {
-        /*
-        foreach(NodeComponent n in visibleNodes)
-        {
-            n.Unlight();
-        }*/
-        //visibleNodes.Clear();
-        Vector3 rayHeight = transform.position + new Vector3(0, -0.2f, 0);
-        RaycastHit hit;
-        float rotation = 0;
-        Quaternion rot = Quaternion.AngleAxis(rotation, Vector3.up);
-        for (int i = 0; i < 16; i++)
-        {
-            if (Physics.Raycast(rayHeight, transform.TransformDirection(rot * Vector3.forward), out hit, 10f, rewardCubes))
-            {
-
-                NodeComponent n = hit.collider.GetComponent<NodeComponent>();
-                if (n != null)
-                {
-                    visibleNodes.Add(n);
-                    n.Light();
-                }
-
-            }
-            if (Physics.Raycast(rayHeight + new Vector3(0,1f,0), transform.TransformDirection(rot * Vector3.forward), out hit, 10f, rewardCubes))
-            {
-
-                NodeComponent n = hit.collider.GetComponent<NodeComponent>();
-                if (n != null)
-                {
-                    visibleNodes.Add(n);
-                    n.Light();
-                }
-
-            }
-            rotation += 22.5f;
-            rot = Quaternion.AngleAxis(rotation, Vector3.up);
-        }
-
         if (useVectorObs)
         {
-            var rayDistance1 = 6f;
-            var rayDistance2 = 12f;
-            float[] rayAngles1 = { 0f, 180f, 110f, 70f };
-            float[] rayAngles2 = { 45f, 90f, 135f};
+            var rayDistance = 12f;
+            float[] rayAngles = { 0f, 45f, 90f, 135f, 180f, 110f, 70f };
             var detectableObjects = new[] { "block", "goal", "wall" };
-            AddVectorObs(rayPer.Perceive(rayDistance1, rayAngles1, detectableObjects, 0f, 0f));
-            AddVectorObs(rayPer.Perceive(rayDistance1, rayAngles1, detectableObjects, 1.5f, 0f));
-            AddVectorObs(rayPer.Perceive(rayDistance2, rayAngles2, detectableObjects, 0f, 0f));
-            AddVectorObs(rayPer.Perceive(rayDistance2, rayAngles2, detectableObjects, 1.5f, 0f));
+            AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 0f, 0f));
+            AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 1.5f, 0f));
             float[] f = CollectRewardObs();
-            //Debug.Log("-90:" + f[0] + "  -45:" + f[1] + "  00:" + f[2] + "  +45:" + f[3] + "  +90:" + f[4] );
-            // Aditional reward-cube observations.
-            if(useNodesObs) AddVectorObs(f);
+            if (useNodesObs) AddVectorObs(f);
+        }
+
+        //Enable or disable the Cheese
+        if (Physics.Linecast(this.transform.position, blockRB.transform.position, wallsLayer))
+        {
+            block.GetComponent<Renderer>().enabled = false;
+        }
+        else
+        {
+            block.GetComponent<Renderer>().enabled = true;
         }
 
     }
@@ -160,13 +122,7 @@ public class PushAgentBasic : Agent
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, 2f, rewardCubes, QueryTriggerInteraction.Collide);
         Collider nc = GetClosestNode(hitColliders);
         float startValue = 0;
-        NodeComponent ncc = null;
-        if (nc != null)
-        {
-            ncc = nc.GetComponent<NodeComponent>();
-            startValue = ncc.value;
-        }
-
+        if (nc != null) startValue = nc.GetComponent<NodeComponent>().value;
         //Debug.Log(startValue);
         float[] ret = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -193,18 +149,11 @@ public class PushAgentBasic : Agent
         Collider bestTarget = null;
         float closestDistanceSqr = Mathf.Infinity;
         Vector3 currentPosition = transform.position;
-        NodeComponent nodeComponent = null;
         foreach (Collider potentialTarget in Nodes)
         {
-            nodeComponent = potentialTarget.GetComponent<NodeComponent>();
-            if (nodeComponent == null) continue;
+            if (potentialTarget.GetComponent<NodeComponent>() == null) continue;
             Vector3 directionToTarget = potentialTarget.transform.position - currentPosition;
             float dSqrToTarget = directionToTarget.sqrMagnitude;
-            if (nodeComponent.Visit())
-            {
-                AddReward(0.05f);
-                Debug.Log("yay!");
-            }
             if (dSqrToTarget < closestDistanceSqr)
             {
                 closestDistanceSqr = dSqrToTarget;
@@ -254,8 +203,8 @@ public class PushAgentBasic : Agent
     /// </summary>
     public void IScoredAGoal()
     {
-        // We use a reward of 2 + Difficulty level.
-        //AddReward(2f + academy.difficulty);
+        // We use a reward of 5.
+        AddReward(5f * (selectedDifficulty + 1));
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
@@ -388,10 +337,7 @@ public class PushAgentBasic : Agent
     /// </summary>
 	public override void AgentReset()
     {
-
-        //PopulateNodes();
         Monitor.SetActive(true);
-        block.GetComponent<Renderer>().enabled = false;
         if (localDifficulty < academy.difficulty)
         {
             localDifficulty = academy.difficulty;
@@ -406,7 +352,7 @@ public class PushAgentBasic : Agent
         {
             selectedDifficulty = Random.Range(0, localDifficulty + 1);
         }
-           
+
         GameObject[] samples = academy.wallDifficulties[selectedDifficulty];
 
         //Using custom maps
