@@ -8,6 +8,8 @@ public class NodeComponent : MonoBehaviour {
     public float value;
     public bool Goal;
     public bool visited;
+    private float waitTime = 8.0f;
+    private float timer = 0.0f;
     Renderer r;
     Material m;
     Color c;
@@ -43,14 +45,25 @@ public class NodeComponent : MonoBehaviour {
             c.r = 0;
             c.g = 0;
             c.b = 1;
-        } else
-        {
-            GetComponent<Renderer>().enabled = false;
         }
-       // c.r = 1-value;
-       // c.g = value;
+        else
+        {
+            c.r = 1;
+            c.g = 0;
+            c.b = 0;
+        }
+        // c.r = 1-value;
+        // c.g = value;
         m.color = c;
         GetComponent<Renderer>().material = m;
+
+        timer += Time.deltaTime;
+        // Check if we have reached beyond 2 seconds.
+        // Subtracting two is more accurate over time than resetting to zero.
+        if (timer > waitTime)
+        {
+            Unlight();
+        }
     }
 
     public void Unlight()
@@ -62,6 +75,7 @@ public class NodeComponent : MonoBehaviour {
     public void Light()
     {
         r.enabled = true;
+        timer = 0;
     }
 
     public void OnDestroy()

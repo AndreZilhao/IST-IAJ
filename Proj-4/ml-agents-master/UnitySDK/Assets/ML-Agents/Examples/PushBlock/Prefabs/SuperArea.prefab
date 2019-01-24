@@ -24,7 +24,6 @@ GameObject:
   - component: {fileID: 23948428438770576}
   - component: {fileID: 54461440100706262}
   - component: {fileID: 114465833969369516}
-  - component: {fileID: 114702858733058190}
   m_Layer: 11
   m_Name: Agent
   m_TagString: agent
@@ -93,8 +92,8 @@ GameObject:
   - component: {fileID: 23160241686380476}
   - component: {fileID: 54926898354835554}
   - component: {fileID: 114077852587307264}
-  - component: {fileID: 114993655797073688}
   - component: {fileID: 136912684598552286}
+  - component: {fileID: 114048752678052622}
   m_Layer: 9
   m_Name: Block
   m_TagString: block
@@ -191,7 +190,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1853704944842140
 GameObject:
   m_ObjectHideFlags: 1
@@ -236,7 +235,7 @@ Transform:
   m_GameObject: {fileID: 1043382969678634}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: -4.43}
-  m_LocalScale: {x: 2, y: 0.75, z: 2}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
   m_Children:
   - {fileID: 4556471534259244}
   - {fileID: 4269612317763594}
@@ -279,7 +278,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1347989782098616}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 80, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4564585002055302}
@@ -390,7 +389,7 @@ Transform:
   m_GameObject: {fileID: 1361982662091370}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2, y: 1, z: -8}
-  m_LocalScale: {x: 3, y: 0.75, z: 3}
+  m_LocalScale: {x: 2, y: 0.75, z: 2}
   m_Children: []
   m_Father: {fileID: 4226957261147036}
   m_RootOrder: 2
@@ -875,7 +874,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 1, z: 0.5}
+  m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &65623523505282992
 BoxCollider:
@@ -951,6 +950,21 @@ AudioListener:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1938054475119478}
   m_Enabled: 1
+--- !u!114 &114048752678052622
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1361982662091370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bd41544e0c526b448019c323b4236a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adjacencies: []
+  value: 0
+  Goal: 0
+  visited: 0
 --- !u!114 &114077852587307264
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -985,11 +999,6 @@ MonoBehaviour:
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 5
-  walls:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   ground: {fileID: 1651765192281220}
   area: {fileID: 1260748229558242}
   areaBounds:
@@ -1003,36 +1012,12 @@ MonoBehaviour:
     m_Bits: 512
   rewardCubes:
     serializedVersion: 2
-    m_Bits: 49152
+    m_Bits: 49664
+  wallsLayer:
+    serializedVersion: 2
+    m_Bits: 16384
   goal: {fileID: 1233523990705816}
-  compass: {fileID: 1571454295224328}
   block: {fileID: 1361982662091370}
-  goalDetect: {fileID: 0}
-  useVectorObs: 0
-  useNodesObs: 0
---- !u!114 &114702858733058190
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1043382969678634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb172294dbbcc408286b156a2c4b553c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114993655797073688
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1361982662091370}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d079d09ceed84ff49cf6841c66cf7ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agent: {fileID: 0}
 --- !u!124 &124056226179966654
 Behaviour:
   m_ObjectHideFlags: 1
@@ -1056,7 +1041,7 @@ CapsuleCollider:
   m_Material: {fileID: 13400000, guid: 1be61b07f47b047389faf65ea43831c4, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.33
+  m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}

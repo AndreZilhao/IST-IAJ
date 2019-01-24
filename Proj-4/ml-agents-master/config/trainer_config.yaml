@@ -34,7 +34,7 @@ BouncerLearning:
     num_layers: 2
     hidden_units: 64
 
-pbl:
+scanBrain:
     use_recurrent: true
     sequence_length: 32
     num_layers: 1

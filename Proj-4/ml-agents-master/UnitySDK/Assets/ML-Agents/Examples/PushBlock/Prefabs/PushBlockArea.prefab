@@ -25,7 +25,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1293433783856340
 GameObject:
   m_ObjectHideFlags: 0
@@ -39,7 +39,6 @@ GameObject:
   - component: {fileID: 23448481644520252}
   - component: {fileID: 54730943036608338}
   - component: {fileID: 114307495936570092}
-  - component: {fileID: 114350292539814250}
   - component: {fileID: 136392111213536030}
   m_Layer: 9
   m_Name: Block
@@ -148,7 +147,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1125452240183160}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -129.4, y: 0, z: 82.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4602883320979440}
@@ -600,18 +599,6 @@ MonoBehaviour:
   agentMask:
     serializedVersion: 2
     m_Bits: 2048
---- !u!114 &114350292539814250
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1293433783856340}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d079d09ceed84ff49cf6841c66cf7ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agent: {fileID: 0}
 --- !u!114 &114421647563711602
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -642,11 +629,6 @@ MonoBehaviour:
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 5
-  walls:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   ground: {fileID: 1500989011945850}
   area: {fileID: 1125452240183160}
   areaBounds:
@@ -661,11 +643,11 @@ MonoBehaviour:
   rewardCubes:
     serializedVersion: 2
     m_Bits: 49152
+  wallsLayer:
+    serializedVersion: 2
+    m_Bits: 0
   goal: {fileID: 1441513772919942}
   block: {fileID: 1293433783856340}
-  goalDetect: {fileID: 0}
-  useVectorObs: 1
-  useNodesObs: 0
 --- !u!124 &124162893902680432
 Behaviour:
   m_ObjectHideFlags: 1
