@@ -32,7 +32,8 @@ public class NodeComponent : MonoBehaviour {
         if (!visited)
         {
             visited = true;
-            if( !this.gameObject.tag.Equals("block")) gameObject.SetActive(false);
+            this.gameObject.layer = 12;
+            r.enabled = false;
             return true;
         }
         return false;
@@ -40,7 +41,7 @@ public class NodeComponent : MonoBehaviour {
 
     private void Update()
     {
-        if (visited && !this.gameObject.tag.Equals("block"))
+        if (visited)
         {
             c.r = 0;
             c.g = 0;
@@ -68,14 +69,14 @@ public class NodeComponent : MonoBehaviour {
 
     public void Unlight()
     {
-        if(this.gameObject.activeInHierarchy)
             r.enabled = false;
     }
 
     public void Light()
     {
-        r.enabled = true;
-        timer = 0;
+       
+            r.enabled = true;
+            timer = 0;
     }
 
     public void OnDestroy()

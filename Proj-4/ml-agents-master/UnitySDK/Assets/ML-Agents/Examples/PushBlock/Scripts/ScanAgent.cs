@@ -26,12 +26,11 @@ public class ScanAgent : Agent
     public LayerMask blockLayer;
     public LayerMask rewardCubes;
     public LayerMask wallsLayer;
+    public GameObject pushAgent;
+    public bool active;
     private List<NodeComponent> nodes;
     private List<NodeComponent> visibleNodes;
     PushBlockAcademy academy;
-
-
-
 
     /// <summary>
     /// The goal to push the block to.
@@ -64,6 +63,7 @@ public class ScanAgent : Agent
     void Awake()
     {
         academy = FindObjectOfType<PushBlockAcademy>(); //cache the academy
+        active = false;
     }
 
     public override void InitializeAgent()
@@ -86,6 +86,8 @@ public class ScanAgent : Agent
 
     public override void CollectObservations()
     {
+
+        if (!active) return;
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, 2f, rewardCubes, QueryTriggerInteraction.Collide);
         LightClosestNodes(hitColliders);
 
@@ -107,14 +109,6 @@ public class ScanAgent : Agent
             }
             rotation += 22.5f;
             rot = Quaternion.AngleAxis(rotation, Vector3.up);
-        }
-        if (Physics.Linecast(this.transform.position, blockRB.transform.position, wallsLayer))
-        {
-            block.GetComponent<Renderer>().enabled = false;
-        }
-        else
-        {
-            block.GetComponent<Renderer>().enabled = true;
         }
     }
 
@@ -161,14 +155,8 @@ public class ScanAgent : Agent
     /// </summary>
     public void TouchDown()
     {
-        // We use a reward of 2 + Difficulty level.
-        AddReward(5f);
-
-        // By marking an agent as done AgentReset() will be called automatically.
-        Done();
-
-        // Swap ground material for a bit to indicate we scored.
-        StartCoroutine(GoalScoredSwapGroundMaterial(academy.goalScoredMaterial, 0.5f));
+        pushAgent.SetActive(true);
+        this.SetActive(false);
     }
 
     /// <summary>
@@ -225,86 +213,22 @@ public class ScanAgent : Agent
     /// </summary>
     public override void AgentAction(float[] vectorAction, string textAction)
     {
+       
         // Move the agent using the action.
-        MoveAgent(vectorAction);
+        if (active)
+        {
+            MoveAgent(vectorAction);
 
-        // Penalty given each step to encourage agent to finish task quickly.
-        AddReward(-1f / agentParameters.maxStep);
+            // Penalty given each step to encourage agent to finish task quickly.
+            AddReward(-1f / agentParameters.maxStep);
 
-        // Monitors the time left of the agent.
-        Monitor.Log("Life:", (10000f - GetStepCount()) / 10000f, this.transform);
+            // Monitors the time left of the agent.
+            Monitor.Log("Life:", (10000f - GetStepCount()) / 10000f, this.transform);
+        }
+       
     }
-
-    /// <summary>
-    /// Resets the block position and velocities.
-    /// </summary>
-    void ResetBlock()
+    public void SetActive(bool flag)
     {
-        // Get a random position for the block.
-        block.transform.position = GetRandomSpawnPos();
-
-        // Reset block velocity back to zero.
-        blockRB.velocity = Vector3.zero;
-
-        // Reset block angularVelocity back to zero.
-        blockRB.angularVelocity = Vector3.zero;
-    }
-
-    /// <summary>
-    /// In the editor, if "Reset On Done" is checked then AgentReset() will be 
-    /// called automatically anytime we mark done = true in an agent script.
-    /// </summary>
-	public override void AgentReset()
-    {
-
-        Monitor.SetActive(true);
-        block.GetComponent<Renderer>().enabled = false;
-        if (localDifficulty < academy.difficulty)
-        {
-            localDifficulty = academy.difficulty;
-        }
-
-        //Selects a random map from available difficulties if not using less maps.
-        if (academy.useLessMaps)
-        {
-            selectedDifficulty = localDifficulty;
-        }
-        else
-        {
-            selectedDifficulty = Random.Range(0, localDifficulty + 1);
-        }
-
-        GameObject[] samples = academy.wallDifficulties[selectedDifficulty];
-
-        //Using custom maps
-        if (samples.Length != 0)
-        {
-            Destroy(map);
-            int n = Random.Range(0, samples.Length);
-            map = Instantiate(samples[n], area.transform);
-            Monitor.Log("Map: ", selectedDifficulty.ToString() + "-" + n);
-            Monitor.Log("Difficulty: ", localDifficulty.ToString());
-        }
-
-        int rotation = Random.Range(0, 4);
-        float rotationAngle = rotation * 90f;
-        area.transform.Rotate(new Vector3(0f, rotationAngle, 0f));
-        ResetBlock1();
-        transform.position = GetRandomSpawnPos();
-        agentRB.velocity = Vector3.zero;
-        agentRB.angularVelocity = Vector3.zero;
-        //transform.Rotate(new Vector3(0f, Random.Range(0, 8) * 45f, 0f));
-    }
-
-    void ResetBlock1()
-    {
-        // Get a random position for the block.
-        block.transform.position = GetRandomSpawnPos();
-
-        // Reset block velocity back to zero.
-        blockRB.velocity = Vector3.zero;
-
-        // Reset block angularVelocity back to zero.
-        blockRB.angularVelocity = Vector3.zero;
+        this.active = flag;
     }
 }

@@ -63,6 +63,8 @@ public class PushBlockAcademy : Academy
     public GameObject[] wallsHard;
     public GameObject[] wallsVeryHard;
 
+    public bool useScan;
+
     void State()
     {
         Physics.gravity *= gravityMultiplier;

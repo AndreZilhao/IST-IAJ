@@ -34,7 +34,6 @@ public class PushAgentBasic : Agent
     /// The goal to push the block to.
     /// </summary>
     public GameObject goal;
-    public GameObject compass;
 
     /// <summary>
     /// The block to be pushed to the goal.
@@ -52,11 +51,13 @@ public class PushAgentBasic : Agent
     private int localDifficulty = 0;
     private int selectedDifficulty = 0;
     private GameObject map;
+    public bool active;
 
     Rigidbody blockRB;  //cached on initialization
     Rigidbody agentRB;  //cached on initialization
     Material groundMaterial; //cached on Awake()
     RayPerception rayPer;
+    private ScanAgent scanAgent;
 
     /// <summary>
     /// We will be changing the ground material based on success/failue
@@ -68,6 +69,11 @@ public class PushAgentBasic : Agent
         academy = FindObjectOfType<PushBlockAcademy>(); //cache the academy
     }
 
+    void SetActive(bool flag)
+    {
+        active = flag;
+    }
+
     public override void InitializeAgent()
     {
         base.InitializeAgent();
@@ -75,6 +81,18 @@ public class PushAgentBasic : Agent
         goalDetect.agent = this;
         rayPer = GetComponent<RayPerception>();
         localDifficulty = academy.difficulty;
+        scanAgent = GetComponent<ScanAgent>();
+        SetActive(true);
+
+        if (academy.useScan)
+        {
+            SetActive(false);
+            scanAgent.SetActive(true);
+        }
+        else
+        {
+            scanAgent.SetActive(false);
+        }
 
 
         // Cache the agent rigidbody
@@ -111,7 +129,10 @@ public class PushAgentBasic : Agent
         {
             block.GetComponent<Renderer>().enabled = true;
         }
-
+        if (!active)
+        {
+            scanAgent.RequestDecision();
+        }   
     }
 
     public float[] CollectRewardObs()
@@ -123,8 +144,8 @@ public class PushAgentBasic : Agent
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, 2f, rewardCubes, QueryTriggerInteraction.Collide);
         Collider nc = GetClosestNode(hitColliders);
         float startValue = 0;
+
         if (nc != null) startValue = nc.GetComponent<NodeComponent>().value;
-        //Debug.Log(startValue);
         float[] ret = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
         for (int i = 0; i < 8; i++)
@@ -193,7 +214,7 @@ public class PushAgentBasic : Agent
     public void IScoredAGoal()
     {
         // We use a reward of 5.
-        AddReward(5f * (selectedDifficulty + 1));
+        AddReward(2f + selectedDifficulty);
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
@@ -256,14 +277,18 @@ public class PushAgentBasic : Agent
     /// </summary>
 	public override void AgentAction(float[] vectorAction, string textAction)
     {
-        // Move the agent using the action.
-        MoveAgent(vectorAction);
+        if (active)
+        {
+            //Debug.Log("I'm now alive");
+            // Move the agent using the action.
+            MoveAgent(vectorAction);
 
-        // Penalty given each step to encourage agent to finish task quickly.
-        AddReward(-1f / agentParameters.maxStep);
+            // Penalty given each step to encourage agent to finish task quickly.
+            AddReward(-1f / agentParameters.maxStep);
 
-        // Monitors the time left of the agent.
-        Monitor.Log("Life:", (10000f - GetStepCount()) / 10000f, this.transform);
+            // Monitors the time left of the agent.
+            Monitor.Log("Life:", (10000f - GetStepCount()) / 10000f, this.transform);
+        }
     }
 
     /// <summary>
@@ -361,7 +386,17 @@ public class PushAgentBasic : Agent
         transform.position = GetRandomSpawnPos();
         agentRB.velocity = Vector3.zero;
         agentRB.angularVelocity = Vector3.zero;
-        //transform.Rotate(new Vector3(0f, Random.Range(0, 8) * 45f, 0f));
+        if (academy.useScan)
+        {
+            SetActive(false);
+            scanAgent.SetActive(true);
+        }
+        else
+        {
+            SetActive(true);
+            scanAgent.SetActive(false);
+        }
+        this.transform.rotation = Quaternion.identity;
     }
 
     void ResetBlock1()
