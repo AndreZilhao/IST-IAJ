@@ -13,7 +13,11 @@ public class BlockProximity : MonoBehaviour
     {
         if (Physics.CheckBox(this.transform.position, new Vector3(1.0f, 2.5f, 1.0f), Quaternion.identity, agentMask))
         {
-            agent.GetComponent<ScanAgent>().TouchDown();
+            Debug.Log("I found you");
+            agent.GetComponent<PushAgentBasic>().IScoredAGoal();
         }
     }
 }
+
+            //Debug.Log("I found you");
+            //agent.GetComponent<PushAgentBasic>().IScoredAGoal();
