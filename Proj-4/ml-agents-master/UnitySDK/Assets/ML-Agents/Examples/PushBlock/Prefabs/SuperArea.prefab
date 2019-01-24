@@ -228,7 +228,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4006175766801958
 Transform:
   m_ObjectHideFlags: 1
@@ -978,7 +978,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 594ffe6acae455e48bffb548d52613d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brain: {fileID: 11400000, guid: def67b495f96fa044847be946b9c6f64, type: 2}
+  brain: {fileID: 11400000, guid: 24db44e4e9d93094b90ea8307edb78c4, type: 2}
   agentParameters:
     agentCameras: []
     maxStep: 10000
@@ -1004,7 +1004,7 @@ MonoBehaviour:
   block: {fileID: 1361982662091370}
   goalDetect: {fileID: 0}
   useVectorObs: 1
-  useNodesObs: 1
+  useNodesObs: 0
   active: 0
 --- !u!114 &114465833969369516
 MonoBehaviour:
@@ -1012,7 +1012,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1043382969678634}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dea8c4f2604b947e6b7b97750dde87ca, type: 3}
   m_Name: 

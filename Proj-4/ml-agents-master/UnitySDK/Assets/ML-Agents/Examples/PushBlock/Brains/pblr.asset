@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Name: pblr
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 78
+    vectorObservationSize: 70
     numStackedVectorObservations: 5
     vectorActionSize: 07000000
     cameraResolutions: []
     vectorActionDescriptions:
     - 
     vectorActionSpaceType: 0
-  model: {fileID: 4900000, guid: 815cc42049c4b8a44b98dedf25f4ea14, type: 3}
+  model: {fileID: 0}
