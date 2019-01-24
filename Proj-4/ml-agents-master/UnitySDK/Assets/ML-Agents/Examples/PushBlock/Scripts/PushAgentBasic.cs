@@ -214,7 +214,7 @@ public class PushAgentBasic : Agent
     public void IScoredAGoal()
     {
         // We use a reward of 5.
-        AddReward(2f + selectedDifficulty);
+        AddReward(2f + localDifficulty);
 
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
