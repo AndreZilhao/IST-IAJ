@@ -285,9 +285,8 @@ public class PushAgentBasic : Agent
 
             // Penalty given each step to encourage agent to finish task quickly.
             AddReward(-1f / agentParameters.maxStep);
-
             // Monitors the time left of the agent.
-            Monitor.Log("Life:", (10000f - GetStepCount()) / 10000f, this.transform);
+            Monitor.Log("Life:", (-1 + (float)GetStepCount() / (float)agentParameters.maxStep), this.transform);
         }
     }
 

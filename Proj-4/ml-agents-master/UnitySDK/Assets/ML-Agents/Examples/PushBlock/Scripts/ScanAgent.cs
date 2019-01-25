@@ -46,12 +46,8 @@ public class ScanAgent : Agent
     /// <summary>
     /// Detects when the block touches the goal.
     /// </summary>
-
-    private int localDifficulty = 0;
-    private int selectedDifficulty = 0;
     private GameObject map;
 
-    Rigidbody blockRB;  //cached on initialization
     Rigidbody agentRB;  //cached on initialization
     Material groundMaterial; //cached on Awake()
 
@@ -69,14 +65,12 @@ public class ScanAgent : Agent
     public override void InitializeAgent()
     {
         base.InitializeAgent();
-        localDifficulty = academy.difficulty;
         pushAgent = GetComponent<PushAgentBasic>();
 
 
         // Cache the agent rigidbody
         agentRB = GetComponent<Rigidbody>();
         // Cache the block rigidbody
-        blockRB = block.GetComponent<Rigidbody>();
         // Get the ground's bounds
         areaBounds = ground.GetComponent<Collider>().bounds;
         // Get the ground renderer so we can change the material when a goal is scored
@@ -231,7 +225,7 @@ public class ScanAgent : Agent
             AddReward(-1f / agentParameters.maxStep);
 
             // Monitors the time left of the agent.
-            Monitor.Log("Life:", (10000f - GetStepCount()) / 10000f, this.transform);
+            Monitor.Log("Life:", (1-(float)pushAgent.GetStepCount()/(float)pushAgent.agentParameters.maxStep), this.transform);
         }
        
     }
