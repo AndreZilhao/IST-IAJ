@@ -21,6 +21,10 @@ public class PushBlockAcademy : Academy
     /// Whether to use only the maps of the current difficulty. Useful for benchmarking 
     /// </summary>
     public bool useLessMaps;
+    [HideInInspector]
+    public int wins = 0;
+    [HideInInspector]
+    public int resets = 0;
 
     //Curriculum stats
     [HideInInspector]
@@ -64,6 +68,9 @@ public class PushBlockAcademy : Academy
     public GameObject[] wallsVeryHard;
 
     public bool useScan;
+    public bool testing;
+    public int numTests;
+    public int numAgentsTesting;
 
     void State()
     {
@@ -79,6 +86,7 @@ public class PushBlockAcademy : Academy
 
     public override void InitializeAcademy()
     {
+        resets -= numAgentsTesting;
         base.InitializeAcademy();
         wallDifficulties = new GameObject[4][];
         wallDifficulties[0] = wallsEasy;

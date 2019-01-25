@@ -111,7 +111,7 @@ public class ScanAgent : Agent
             rotation += 22.5f;
             rot = Quaternion.AngleAxis(rotation, Vector3.up);
         }
-        if(pushAgent.GetStepCount() > 3000)
+        if(pushAgent.GetStepCount() > 1500)
         {
             this.TouchDown();
         }
@@ -227,7 +227,6 @@ public class ScanAgent : Agent
         if (active)
         {
             MoveAgent(vectorAction);
-
             // Penalty given each step to encourage agent to finish task quickly.
             AddReward(-1f / agentParameters.maxStep);
 

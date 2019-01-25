@@ -228,7 +228,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4006175766801958
 Transform:
   m_ObjectHideFlags: 1
@@ -280,7 +280,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1347989782098616}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 38, y: 0, z: 0}
+  m_LocalPosition: {x: 33.6, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4564585002055302}
@@ -402,7 +402,7 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1938054475119478}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 2
   m_BackGroundColor: {r: 0.2735849, g: 0.2735849, b: 0.2735849, a: 0}
@@ -1012,7 +1012,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1043382969678634}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dea8c4f2604b947e6b7b97750dde87ca, type: 3}
   m_Name: 
@@ -1021,7 +1021,7 @@ MonoBehaviour:
   agentParameters:
     agentCameras:
     - {fileID: 20203913233326728}
-    maxStep: 10000
+    maxStep: 1000
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 5
@@ -1043,7 +1043,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16384
   pushAgent: {fileID: 0}
-  active: 0
+  active: 1
   goal: {fileID: 1233523990705816}
   block: {fileID: 1361982662091370}
 --- !u!114 &114680693221686318

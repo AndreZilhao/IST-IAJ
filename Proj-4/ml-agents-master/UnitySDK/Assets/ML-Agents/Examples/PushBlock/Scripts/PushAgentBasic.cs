@@ -1,4 +1,4 @@
-//Put this script on your blue cube.
+﻿//Put this script on your blue cube.
 
 using System.Collections;
 using System.Collections.Generic;
@@ -132,7 +132,7 @@ public class PushAgentBasic : Agent
         if (!active)
         {
             scanAgent.RequestDecision();
-        }   
+        }
     }
 
     public float[] CollectRewardObs()
@@ -214,8 +214,8 @@ public class PushAgentBasic : Agent
     public void IScoredAGoal()
     {
         // We use a reward of 5.
-        AddReward(1f);
-
+        AddReward(2f + localDifficulty);
+        academy.wins++;
         // By marking an agent as done AgentReset() will be called automatically.
         Done();
 
@@ -284,7 +284,7 @@ public class PushAgentBasic : Agent
             MoveAgent(vectorAction);
 
             // Penalty given each step to encourage agent to finish task quickly.
-            //AddReward(-1f / agentParameters.maxStep);
+            AddReward(-1f / agentParameters.maxStep);
 
             // Monitors the time left of the agent.
             Monitor.Log("Life:", (10000f - GetStepCount()) / 10000f, this.transform);
@@ -351,6 +351,7 @@ public class PushAgentBasic : Agent
     /// </summary>
 	public override void AgentReset()
     {
+        academy.resets++;
         Monitor.SetActive(true);
         if (localDifficulty < academy.difficulty)
         {
@@ -397,6 +398,16 @@ public class PushAgentBasic : Agent
             scanAgent.SetActive(false);
         }
         this.transform.rotation = Quaternion.identity;
+        if (academy.testing)
+        {
+            if (academy.resets >= academy.numTests)
+            {
+                Debug.Log(academy.difficulty + "|" + academy.wins + " | " + academy.resets);
+                academy.difficulty++;
+                academy.resets = 0;
+                academy.wins = 0;
+            }
+        }
     }
 
     void ResetBlock1()
