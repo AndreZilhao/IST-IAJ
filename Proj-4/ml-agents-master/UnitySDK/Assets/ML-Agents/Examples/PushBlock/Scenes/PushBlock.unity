@@ -1972,7 +1972,7 @@ MonoBehaviour:
   - {fileID: 1870506039673922, guid: 0d04ed000b1b2754fbe91777a177a979, type: 2}
   - {fileID: 1700526287348420, guid: 7c461374e0d5dc74699a75b1c029d1be, type: 2}
   useScan: 1
-  testing: 1
+  testing: 0
   numTests: 400
   numAgentsTesting: 8
 --- !u!4 &1574236049
